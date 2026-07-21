@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MODL
 
-## Getting Started
+Plateforme mobile-first pour fluidifier les échanges entre mannequins/modèles, photographes et marques/enseignes.
 
-First, run the development server:
+## 🎯 Concept
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+MODL structure les castings et remplace les échanges flous sur Instagram par une plateforme dédiée :
+- **Côté MODEL** : Expérience style Indeed (annonces claires, postulation simple)
+- **Côté BRAND/ENSEIGNE** : Expérience style Tinder (swipe des candidatures)
+- **Côté PHOTOGRAPHER** : Publication d'annonces + gestion de portfolio
+
+## 🚀 Technologies
+
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **React 19**
+
+## 📁 Architecture
+
+```
+modl/
+├── app/                    # Pages Next.js (App Router)
+│   ├── page.tsx           # Landing page
+│   ├── auth/              # Authentification mock
+│   ├── onboarding/        # Choix du rôle
+│   ├── jobs/             # Liste et détail des annonces
+│   ├── post-job/         # Création d'annonce (BRAND/PHOTOGRAPHER)
+│   ├── inbox/            # Candidatures reçues (BRAND/PHOTOGRAPHER)
+│   ├── profile/          # Profil utilisateur
+│   └── pricing/          # Page tarifs
+├── src/
+│   ├── types/            # Types TypeScript
+│   ├── lib/              # Utilitaires (auth, utils)
+│   ├── components/       # Composants React
+│   │   ├── ui/          # Composants UI réutilisables
+│   │   └── ...          # Composants spécifiques
+│   └── data/            # Données mock
+└── public/              # Assets statiques
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 Design System
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Police** : Inter (Google Fonts)
+- **Couleurs** : Palette sobre avec accent premium (noir/blanc/gris)
+- **Style** : Mobile-first, responsive, design moderne et épuré
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📦 Installation
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+L'application sera accessible sur `http://localhost:3000`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔐 Authentification (Mode Mock)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Pour cette V1, l'authentification est mockée :
+- Utilisez n'importe quel email pour vous connecter
+- Le rôle sera défini à l'onboarding
+- Les données sont stockées dans `localStorage`
 
-## Deploy on Vercel
+## 📊 Données Mock
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+L'application inclut :
+- **10 annonces** (jobs) variées
+- **10 profils** utilisateurs (modèles, marques, photographes)
+- **10 candidatures** avec différents statuts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛣️ Routes
+
+- `/` - Landing page
+- `/auth` - Connexion/Inscription
+- `/onboarding` - Choix du rôle
+- `/jobs` - Liste des annonces
+- `/jobs/[id]` - Détail d'une annonce
+- `/post-job` - Publier une annonce (BRAND/PHOTOGRAPHER)
+- `/inbox` - Candidatures reçues (BRAND/PHOTOGRAPHER)
+- `/profile` - Profil utilisateur
+- `/pricing` - Tarifs
+
+## 🔄 Prochaines étapes
+
+- Intégration Supabase pour la persistance
+- Authentification réelle
+- Upload d'images
+- Notifications
+- Messagerie intégrée
+
+## 📝 Notes
+
+Cette V1 est un MVP fonctionnel en mode mock, prêt à être connecté à Supabase pour la production.

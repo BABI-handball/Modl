@@ -1,26 +1,538 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #e8e2d8;
+  --foreground: #1a1a1a;
+  --primary: #000000;
+  --primary-hover: #2d2d2d;
+  --beige: #F5F5DC;
+  --beige-dark: #9c9689;
+}
+
+@theme {
+  --color-beige-50: #fefefd;
+  --color-beige-100: #F5F5DC;
+  --color-beige-200: #e8e8d0;
+  --color-beige-300: #d4d0c0;
+  --color-beige-400: #c4c4a8;
+  --color-beige-500: #b0b08c;
+  --color-beige-600: #9c9c78;
+  --color-beige-700: #7a7a5e;
+  --color-beige-800: #5a5a44;
+  --color-beige-900: #3a3a2c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-playfair);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  /* Forcer la possibilité de scroller verticalement partout dans l'app,
+     même si un style inline a mis overflow: hidden quelque part */
+  overflow-y: auto !important;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+  overscroll-behavior: none;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none; /* Chrome/Safari */
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: 
+    /* Texture de bruit/grain pour effet papier */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
+    /* Lignes subtiles pour texture papier */
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      transparent 0.5px,
+      transparent 1.5px,
+      rgba(0, 0, 0, 0.015) 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      transparent 0.5px,
+      transparent 1.5px,
+      rgba(0, 0, 0, 0.015) 2px
+    );
+  background-size: 300px 300px, 3px 3px, 3px 3px;
+  opacity: 0.45;
+  mix-blend-mode: multiply;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    /* Lumière-clé studio — overhead centré, chaud */
+    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(255, 253, 245, 0.92) 0%, rgba(252, 248, 238, 0.55) 38%, transparent 65%),
+    /* Bounce lumière gauche — réflecteur latéral */
+    radial-gradient(ellipse 40% 75% at -6% 45%, rgba(255, 251, 242, 0.28) 0%, transparent 58%),
+    /* Rim light droite bas — contre-jour chaud */
+    radial-gradient(ellipse 55% 42% at 108% 92%, rgba(230, 218, 196, 0.32) 0%, transparent 55%),
+    /* Halo bas centre — lumière rebond sol */
+    radial-gradient(ellipse 60% 25% at 50% 108%, rgba(240, 232, 215, 0.2) 0%, transparent 50%);
+  opacity: 1;
+}
+
+/* Typographie améliorée */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 2rem;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+/* Classes utilitaires pour la police display */
+.font-display {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+.font-body {
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+p {
+  line-height: 1.6;
+}
+
+/* Smooth transitions pour tous les éléments interactifs */
+button, a, input, textarea, select {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Performance optimisations */
+button, a {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Amélioration des scrolls */
+.overflow-y-auto, .overflow-x-auto, .overflow-auto {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Prévenir les micro-tremblements */
+img, video {
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Animations fluides */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    backgroundPosition: -200% 0;
+  }
+  100% {
+    backgroundPosition: 200% 0;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.25s ease-out;
+}
+
+/* Animation pour les modals */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scrollbar moderne et fluide */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d0c7;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b0b08c;
+  background-clip: padding-box;
+}
+
+/* Scrollbar pour Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d0c7 transparent;
+}
+
+/* Scrollbar personnalisée pour les menus déroulants */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f5f5f0;
+  border-radius: 4px;
+  margin: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d4d0c7;
+  border-radius: 4px;
+  border: 1px solid #f5f5f0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #b0b08c;
+}
+
+/* Safari : garder le scroll de la page fluide ; le « bounce » est géré par le navigateur */
+html {
+  overscroll-behavior-y: auto;
+}
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Page d’accueil : scroll interne ; pas de « bounce » / bande blanche en haut ou en bas */
+.home-scroll-root {
+  height: 100vh;
+  max-height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* Masquer l'ascenseur visuel tout en gardant le scroll */
+.home-scroll-root {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+}
+.home-scroll-root::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none; /* Chrome/Safari */
+}
+
+/* Micro-interactions améliorées */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* Focus visible pour l'accessibilité */
+*:focus-visible {
+  outline: 2px solid #b0b08c;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Amélioration du contraste pour l'accessibilité */
+button:not(:disabled):hover,
+a:hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Skip to content pour l'accessibilité */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  z-index: 100;
+  text-decoration: none;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Amélioration des transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animation pour les états de chargement */
+@keyframes shimmer-loading {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 50%,
+    #f0f0f0 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer-loading 2s infinite;
+}
+
+/* Animation bounce-once pour les micro-interactions */
+@keyframes bounce-once {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-bounce-once {
+  animation: bounce-once 0.4s ease-out;
+}
+
+/* Animation scale-in pour les confirmations */
+@keyframes scale-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Animation de pulse doux */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Animation de shake pour les erreurs */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Marquee / ticker infini */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 52s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+/* Reveal au scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Champ date: rendu plus premium (Chrome/Safari/Edge) */
+.modl-date-input {
+  color-scheme: light;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.95) 0%, rgba(250, 248, 242, 1) 55%, rgba(246, 242, 232, 1) 100%);
+  border-color: #ddd6bf;
+}
+
+.modl-date-input:hover {
+  border-color: #cbbf9f;
+}
+
+.modl-date-input:focus-visible {
+  border-color: #8b7f63 !important;
+  box-shadow: 0 0 0 3px rgba(176, 176, 140, 0.22) !important;
+}
+
+.modl-date-input::-webkit-datetime-edit {
+  font-weight: 700;
+  color: #2f2b22;
+  letter-spacing: 0.01em;
+}
+
+.modl-date-input::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  padding: 8px;
+  margin-right: -8px;
+  border-radius: 10px;
+  background-color: rgba(180, 167, 132, 0.24);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.modl-date-input::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(180, 167, 132, 0.38);
+  transform: scale(1.04);
 }
