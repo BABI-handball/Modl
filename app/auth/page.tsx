@@ -258,8 +258,8 @@ export default function AuthPage() {
           height: '100%',
         }}
       />
-      {/* Overlay beige pour améliorer la lisibilité */}
-      <div className="absolute inset-0 z-10 bg-beige-50/75" />
+      {/* Overlay beige léger pour la lisibilité */}
+      <div className="absolute inset-0 z-10 bg-beige-50/48" />
         
       {/* Quick Switch - visible uniquement en développement local */}
       {process.env.NODE_ENV === 'development' && (
@@ -323,7 +323,7 @@ export default function AuthPage() {
         </div>
 
         {/* Formulaire classique */}
-        <Card className="group w-full backdrop-blur-md bg-white/50 border-beige-300/40 shadow-lg">
+        <Card className="group w-full backdrop-blur-md bg-white/42 border-beige-300/40 shadow-lg">
           <div
             className={`transition-all duration-300 ease-out ${
               isSwitchingView ? 'opacity-0 translate-y-1 scale-[0.995]' : 'opacity-100 translate-y-0 scale-100'

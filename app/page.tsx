@@ -159,11 +159,11 @@ export default function HomePage() {
         >
           <source src="/hero-background.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-beige-50/28 via-beige-50/34 to-beige-50/42" />
-        <div className="absolute inset-0 z-10 bg-[radial-gradient(ellipse_120%_85%_at_50%_0%,rgba(255,253,245,0.22),transparent_52%)] pointer-events-none" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-beige-50/16 via-beige-50/20 to-beige-50/28" />
+        <div className="absolute inset-0 z-10 bg-[radial-gradient(ellipse_120%_85%_at_50%_0%,rgba(255,253,245,0.12),transparent_52%)] pointer-events-none" />
         {/* Lisibilité du bloc bas sans masquer la vidéo */}
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[11] h-[min(70%,520px)] bg-gradient-to-t from-[rgba(245,240,232,0.9)] via-[rgba(245,240,232,0.35)] to-transparent sm:h-[min(65%,560px)]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[11] h-[min(70%,520px)] bg-gradient-to-t from-[rgba(245,240,232,0.72)] via-[rgba(245,240,232,0.22)] to-transparent sm:h-[min(65%,560px)]"
           aria-hidden={true}
         />
 
