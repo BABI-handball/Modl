@@ -179,38 +179,40 @@ export default function HomePage() {
                 />
               </div>
 
-              <p className="font-body mb-4 max-w-xl text-[10px] font-semibold uppercase tracking-[0.38em] text-neutral-600 sm:mb-5 sm:text-[11px] sm:tracking-[0.42em]">
-                Casting · Mode · Paris &amp; Île-de-France
-              </p>
+              <div className="max-w-2xl rounded-2xl border border-white/60 bg-white/52 px-5 py-6 shadow-[0_12px_40px_rgba(0,0,0,0.1)] backdrop-blur-md sm:rounded-3xl sm:px-8 sm:py-8 lg:max-w-3xl">
+                <p className="font-body mb-4 inline-flex items-center rounded-full border border-beige-200/80 bg-white/80 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-neutral-800 shadow-sm backdrop-blur-sm sm:mb-5 sm:text-[11px] sm:tracking-[0.38em]">
+                  Casting · Mode · Paris &amp; Île-de-France
+                </p>
 
-              <h1 className="font-display max-w-[22rem] text-[1.9rem] font-bold leading-[1.06] tracking-tight text-neutral-900 sm:max-w-3xl sm:text-5xl sm:leading-[1.05] md:text-6xl md:leading-[1.02] lg:max-w-4xl lg:text-[3.75rem]">
-                Structurez vos castings,
-                <br />
-                <span className="font-normal italic text-beige-800">trouvez les talents parfaits.</span>
-              </h1>
+                <h1 className="font-display max-w-[22rem] text-[1.9rem] font-bold leading-[1.06] tracking-tight text-neutral-900 sm:max-w-3xl sm:text-5xl sm:leading-[1.05] md:text-6xl md:leading-[1.02] lg:max-w-4xl lg:text-[3.75rem]">
+                  Structurez vos castings,
+                  <br />
+                  <span className="font-normal italic text-beige-900">trouvez les talents parfaits.</span>
+                </h1>
 
-              <p className="font-body mt-5 max-w-md text-pretty text-[0.95rem] leading-relaxed text-neutral-700 sm:mt-6 sm:max-w-lg sm:text-lg sm:leading-[1.65]">
-                Une plateforme pour les marques, créatifs et modèles&nbsp;: annonces, candidatures et messages, le tout au même endroit.
-              </p>
+                <p className="font-body mt-5 max-w-md text-pretty text-[0.95rem] leading-relaxed text-neutral-800 sm:mt-6 sm:max-w-lg sm:text-lg sm:leading-[1.65]">
+                  Une plateforme pour les marques, créatifs et modèles&nbsp;: annonces, candidatures et messages, le tout au même endroit.
+                </p>
 
-              <div className="mt-8 flex flex-col items-start gap-5 sm:mt-10 sm:flex-row sm:items-center sm:gap-8">
-                <Link href="/auth" className="inline-flex">
-                  <Button size="md" variant="beige" className="px-9 py-3.5 text-sm font-medium shadow-lg shadow-beige-900/20">
-                    Commencer
-                  </Button>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => scrollTo('tarifs')}
-                  className="font-body group inline-flex items-center gap-2 text-sm font-medium text-neutral-800 transition-colors hover:text-beige-800"
-                >
-                  <span className="border-b border-neutral-800/25 pb-px transition-[border-color] group-hover:border-beige-700/60">
-                    Voir les tarifs
-                  </span>
-                  <span aria-hidden className="text-beige-700 transition-transform group-hover:translate-x-0.5">
-                    →
-                  </span>
-                </button>
+                <div className="mt-8 flex flex-col items-start gap-5 sm:mt-10 sm:flex-row sm:items-center sm:gap-8">
+                  <Link href="/auth" className="inline-flex">
+                    <Button size="md" variant="beige" className="px-9 py-3.5 text-sm font-medium shadow-lg shadow-beige-900/20">
+                      Commencer
+                    </Button>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => scrollTo('tarifs')}
+                    className="font-body group inline-flex items-center gap-2 text-sm font-medium text-neutral-900 transition-colors hover:text-beige-800"
+                  >
+                    <span className="border-b border-neutral-900/30 pb-px transition-[border-color] group-hover:border-beige-700/60">
+                      Voir les tarifs
+                    </span>
+                    <span aria-hidden className="text-beige-700 transition-transform group-hover:translate-x-0.5">
+                      →
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
