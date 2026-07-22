@@ -12,7 +12,6 @@ import { Input } from '@/src/components/ui/Input';
 import { Badge } from '@/src/components/ui/Badge';
 import { Toast } from '@/src/components/ui/Toast';
 import { cn } from '@/src/lib/utils';
-import { devAccounts } from '@/src/lib/devAccounts';
 import { jobsStore } from '@/src/lib/jobs';
 import { jobsStoreSupabase } from '@/src/lib/jobsSupabase';
 import { userProfilesSupabase } from '@/src/lib/userProfilesSupabase';
@@ -407,7 +406,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-        {/* Quick Switch - Mode développement */}
         {/* Model Profile */}
         {user.role === 'MODEL' && modelProfile && (
           <div className="space-y-4 sm:space-y-6 md:space-y-8">

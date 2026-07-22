@@ -261,7 +261,8 @@ export default function AuthPage() {
       {/* Overlay beige pour améliorer la lisibilité */}
       <div className="absolute inset-0 z-10 bg-beige-50/75" />
         
-      {/* Quick Switch - Mode développement en haut à droite */}
+      {/* Quick Switch - visible uniquement en développement local */}
+      {process.env.NODE_ENV === 'development' && (
       <div className="absolute top-2 right-2 z-30 hidden md:block">
         <Card className="group p-1.5 sm:p-2 shadow-lg max-w-[140px] sm:max-w-[160px]">
           <CardHeader className="pb-1 px-1.5 sm:px-2 pt-0.5 sm:pt-1">
@@ -298,6 +299,7 @@ export default function AuthPage() {
           </CardContent>
         </Card>
       </div>
+      )}
       
       <div
         className={`relative z-20 flex w-full max-w-md flex-col items-center justify-center space-y-1.5 sm:space-y-2 transition-all duration-500 ease-out ${

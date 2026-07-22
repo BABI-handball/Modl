@@ -77,41 +77,45 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-6 border-beige-300 bg-beige-100">
-          <CardHeader>
-            <CardTitle className="text-neutral-900">Mode Démo</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-neutral-700">
-              Réinitialise toutes les données de démo (annonces, candidatures, messages) tout en conservant votre compte actuel.
-            </p>
-            <Button
-              variant="outline"
-              onClick={handleResetDemo}
-              className="w-full border-beige-400 text-beige-700 hover:bg-beige-200"
-            >
-              🔄 Reset Demo Data
-            </Button>
-          </CardContent>
-        </Card>
+        {process.env.NODE_ENV === 'development' && (
+          <>
+            <Card className="mb-6 border-beige-300 bg-beige-100">
+              <CardHeader>
+                <CardTitle className="text-neutral-900">Mode Démo</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-neutral-700">
+                  Réinitialise toutes les données de démo (annonces, candidatures, messages) tout en conservant votre compte actuel.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={handleResetDemo}
+                  className="w-full border-beige-400 text-beige-700 hover:bg-beige-200"
+                >
+                  🔄 Reset Demo Data
+                </Button>
+              </CardContent>
+            </Card>
 
-        <Card className="mb-6 border-beige-200">
-          <CardHeader>
-            <CardTitle className="text-neutral-900">Compte Test</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-neutral-700">
-              Charge un nouveau compte modèle "Sophie Martin" avec toutes les mensurations détaillées pour tester l'affichage.
-            </p>
-            <Button
-              variant="beige"
-              onClick={handleLoadNewModelAccount}
-              className="w-full"
-            >
-              ✨ Charger nouveau compte modèle complet
-            </Button>
-          </CardContent>
-        </Card>
+            <Card className="mb-6 border-beige-200">
+              <CardHeader>
+                <CardTitle className="text-neutral-900">Compte Test</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-neutral-700">
+                  Charge un nouveau compte modèle &quot;Sophie Martin&quot; avec toutes les mensurations détaillées pour tester l&apos;affichage.
+                </p>
+                <Button
+                  variant="beige"
+                  onClick={handleLoadNewModelAccount}
+                  className="w-full"
+                >
+                  ✨ Charger nouveau compte modèle complet
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
         </div>
       </div>
     </div>
