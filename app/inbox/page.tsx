@@ -284,7 +284,7 @@ export default function InboxPage() {
         try {
           const modelProfile = getModelProfile(application.modelUserId);
           const modelName = modelProfile?.name || '';
-          const initialMessage = `Salut ${modelName}, ton profil nous intéresse pour "${job.title}". Seriez-vous disponible pour en discuter ?`;
+          const initialMessage = `Bonjour ${modelName}, votre profil nous intéresse pour "${job.title}". Seriez-vous disponible pour échanger ?`;
           const threadId = messagesStore.getOrCreateThread(
             user.id,
             application.modelUserId,

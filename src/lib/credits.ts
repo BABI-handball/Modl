@@ -1,10 +1,15 @@
 // Credits system — localStorage-first, Supabase background sync
 // MODEL users get 5 credits/week to unlock PAID job listings
 // UNPAID (collaboration) listings are always free
+// Pendant la beta : crédits illimités (le geste de déblocage reste)
+
+import { IS_BETA } from '@/src/lib/beta';
 
 const CREDITS_KEY = 'modl_credits';
 const UNLOCKED_KEY = 'modl_unlocked_listings';
 const DEFAULT_CREDITS = 5;
+/** Valeur affichée / utilisée en beta pour simuler l'illimité */
+export const BETA_UNLIMITED_CREDITS = 999;
 const RESET_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours
 
 interface CreditsData {
@@ -71,6 +76,7 @@ function checkAndResetIfNeeded(userId: string): CreditsData {
 export const creditsStore = {
   /** Retourne le nombre de credits restants (apres reset si necessaire) */
   getCredits(userId: string): number {
+    if (IS_BETA) return BETA_UNLIMITED_CREDITS;
     const data = checkAndResetIfNeeded(userId);
     return data.credits;
   },
@@ -82,16 +88,25 @@ export const creditsStore = {
 
   /** Verifie si l'utilisateur peut debloquer (a au moins 1 credit) */
   canUnlock(userId: string): boolean {
+    if (IS_BETA) return true;
     return this.getCredits(userId) > 0;
   },
 
   /**
    * Debloque une annonce en consommant 1 credit.
    * Retourne true si reussi, false si pas assez de credits.
+   * En beta : débloque sans consommer de crédit.
    */
   unlockListing(userId: string, listingId: string): boolean {
     // Deja debloquee = gratuit
     if (this.isUnlocked(userId, listingId)) return true;
+
+    if (IS_BETA) {
+      const unlocked = getUnlockedListings(userId);
+      unlocked.push(listingId);
+      saveUnlockedListings(userId, unlocked);
+      return true;
+    }
 
     const data = checkAndResetIfNeeded(userId);
     if (data.credits <= 0) return false;

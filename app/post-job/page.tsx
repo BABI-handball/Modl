@@ -7,6 +7,7 @@ import { JobPost, JobType, PayType } from '@/src/types';
 import { jobsStore } from '@/src/lib/jobs';
 import { jobsStoreSupabase } from '@/src/lib/jobsSupabase';
 import { listingQuota } from '@/src/lib/listingQuota';
+import { BETA_COPY, IS_BETA } from '@/src/lib/beta';
 import { createClient } from '@/src/lib/supabase/client';
 import { ListingQuotaGate, CreditPack } from '@/src/components/ListingQuotaGate';
 import { Button } from '@/src/components/ui/Button';
@@ -329,8 +330,10 @@ export default function PostJobPage() {
                 <svg className={`h-4 w-4 flex-shrink-0 ${remaining === 0 ? 'text-red-600' : 'text-beige-700'}`} fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                 </svg>
-                <span className="text-base leading-none">{remaining}</span>
-                <span className="leading-none">annonce{remaining !== 1 ? 's' : ''} restante{remaining !== 1 ? 's' : ''} ce mois</span>
+                <span className="text-base leading-none">{IS_BETA ? '∞' : remaining}</span>
+                <span className="leading-none">
+                  {IS_BETA ? BETA_COPY.listingsLabel : `annonce${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''} ce mois`}
+                </span>
               </div>
             </div>
           </div>

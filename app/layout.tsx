@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/src/components/Navbar";
+import { BetaBanner } from "@/src/components/BetaBanner";
 import { SeedInitializer } from "@/src/components/SeedInitializer";
 import { SkipToContent } from "@/src/components/ui/SkipToContent";
 
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${playfair.variable} antialiased`} style={{ backgroundColor: '#faf9f7', position: 'relative' }}>
         <SkipToContent />
         <SeedInitializer />
+        <BetaBanner />
         <main id="main-content" className="relative z-[1] min-h-0 overflow-visible">
           {children}
         </main>

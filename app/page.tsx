@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/src/components/ui/Button';
+import { BETA_COPY, IS_BETA } from '@/src/lib/beta';
 
 // ── Scroll-reveal hook ──────────────────────────────────────────────
 function useReveal() {
@@ -182,6 +183,11 @@ export default function HomePage() {
               <p className="font-body mb-4 max-w-xl text-[10px] font-semibold uppercase tracking-[0.38em] text-neutral-600 sm:mb-5 sm:text-[11px] sm:tracking-[0.42em]">
                 Casting · Mode · Paris &amp; Île-de-France
               </p>
+              {IS_BETA && (
+                <p className="font-body mb-4 max-w-xl text-[11px] font-medium text-beige-800 sm:mb-5 sm:text-sm">
+                  {BETA_COPY.heroTag}
+                </p>
+              )}
 
               <h1 className="font-display max-w-[22rem] text-[1.9rem] font-bold leading-[1.06] tracking-tight text-neutral-900 sm:max-w-3xl sm:text-5xl sm:leading-[1.05] md:text-6xl md:leading-[1.02] lg:max-w-4xl lg:text-[3.75rem]">
                 Structurez vos castings,
@@ -637,17 +643,44 @@ export default function HomePage() {
           {/* Header */}
           <div className="text-center mb-14">
             <p className="font-body text-[11px] font-semibold uppercase tracking-[0.22em] text-beige-500 mb-4">
-              Tarifs · Paris / Île-de-France
+              {IS_BETA ? 'Beta · Accès gratuit' : 'Tarifs · Paris / Île-de-France'}
             </p>
             <h2 className="font-display text-[2.35rem] sm:text-5xl lg:text-6xl font-bold text-white leading-[1.05] mb-5 text-balance">
-              Investissez dans<br />
-              <span className="italic text-beige-400">vos castings</span>
+              {IS_BETA ? (
+                <>
+                  Beta gratuite —<br />
+                  <span className="italic text-beige-400">tout est offert</span>
+                </>
+              ) : (
+                <>
+                  Investissez dans<br />
+                  <span className="italic text-beige-400">vos castings</span>
+                </>
+              )}
             </h2>
-            <p className="font-body text-base text-neutral-400 max-w-md mx-auto leading-relaxed">
-              Commencez gratuitement, évoluez quand vous êtes prêt·e, annulation à tout moment.
+            <p className="font-body text-base text-neutral-400 max-w-lg mx-auto leading-relaxed">
+              {IS_BETA
+                ? BETA_COPY.pricingSub
+                : 'Commencez gratuitement, évoluez quand vous êtes prêt·e, annulation à tout moment.'}
             </p>
 
-            {/* Toggle mensuel / annuel */}
+            {IS_BETA && (
+              <div className="mt-8 mx-auto max-w-md rounded-2xl border border-beige-500/30 bg-beige-50/95 px-6 py-5 text-left">
+                <p className="font-display text-2xl font-bold text-neutral-900 mb-2">0€ pendant la beta</p>
+                <ul className="space-y-1.5 text-sm text-neutral-700">
+                  <li>· Annonces illimitées</li>
+                  <li>· Crédits illimités pour débloquer</li>
+                  <li>· Accès complet à la plateforme</li>
+                </ul>
+                <Link href="/auth" className="mt-4 inline-flex">
+                  <Button variant="beige" size="md" className="px-6">
+                    Rejoindre la beta
+                  </Button>
+                </Link>
+              </div>
+            )}
+
+            {!IS_BETA && (
             <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border border-neutral-700 bg-neutral-800/60 p-1.5">
               <button
                 type="button"
@@ -673,7 +706,14 @@ export default function HomePage() {
                 </span>
               </button>
             </div>
+            )}
           </div>
+
+          {IS_BETA && (
+            <p className="font-body mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+              Aperçu des tarifs à venir
+            </p>
+          )}
 
           {/* Cards — pt pour laisser dépasser le badge « Populaire » (overflow-visible sur la carte) */}
           <div className="grid grid-cols-1 gap-5 pt-4 md:grid-cols-3 md:items-stretch md:pt-5 lg:gap-6">
@@ -684,7 +724,7 @@ export default function HomePage() {
                   plan.highlighted
                     ? 'border-beige-500/40 bg-beige-50/95 shadow-[0_8px_40px_rgba(176,176,140,0.2)] md:-translate-y-2 md:scale-[1.02] hover:-translate-y-3 hover:scale-[1.03] hover:border-beige-400/80 hover:shadow-[0_24px_56px_rgba(180,160,110,0.35)]'
                     : 'border-neutral-700/50 bg-neutral-800/60 backdrop-blur-sm hover:-translate-y-2 hover:border-beige-500/35 hover:bg-neutral-800/90 hover:shadow-[0_20px_50px_rgba(0,0,0,0.42)]'
-                }`}
+                } ${IS_BETA ? 'opacity-90' : ''}`}
               >
                 {/* Reflet / profondeur au survol */}
                 <div
@@ -707,7 +747,7 @@ export default function HomePage() {
                 {plan.badge && (
                   <div className="absolute -top-4 left-1/2 z-20 -translate-x-1/2 sm:-top-5">
                     <span className="inline-flex items-center gap-1 rounded-full bg-beige-600 px-3.5 py-1.5 text-[11px] font-semibold text-white shadow-md ring-2 ring-beige-50/90 font-body">
-                      {plan.badge}
+                      {IS_BETA ? 'À venir' : plan.badge}
                     </span>
                   </div>
                 )}
@@ -737,6 +777,11 @@ export default function HomePage() {
                     {plan.monthlyPrice === 0 && (
                       <p className={`font-body mt-1 text-xs ${plan.highlighted ? 'text-neutral-400' : 'text-neutral-500'}`}>Toujours gratuit</p>
                     )}
+                    {IS_BETA && plan.monthlyPrice > 0 && (
+                      <p className={`font-body mt-1 text-xs ${plan.highlighted ? 'text-beige-700' : 'text-beige-400'}`}>
+                        Non facturé pendant la beta
+                      </p>
+                    )}
                   </div>
 
                   <div className={`mb-6 h-px ${plan.highlighted ? 'bg-beige-200' : 'bg-neutral-700'}`} />
@@ -756,7 +801,7 @@ export default function HomePage() {
                       size="md"
                       className={`w-full transition-transform duration-300 group-hover:scale-[1.02] ${!plan.highlighted ? 'border-neutral-600 text-neutral-200 hover:bg-neutral-700/50' : ''}`}
                     >
-                      {plan.cta}
+                      {IS_BETA ? 'Rejoindre la beta' : plan.cta}
                     </Button>
                   </Link>
                 </div>
@@ -765,7 +810,9 @@ export default function HomePage() {
           </div>
 
           <p className="font-body mt-10 text-center text-xs text-neutral-500">
-            Paiement en ligne sécurisé · Sans engagement · Annulation à tout moment
+            {IS_BETA
+              ? BETA_COPY.footer
+              : 'Paiement en ligne sécurisé · Sans engagement · Annulation à tout moment'}
           </p>
         </div>
       </section>
@@ -796,7 +843,9 @@ export default function HomePage() {
             {/* Ornement */}
             <div className="mb-5 flex items-center justify-center gap-4">
               <div className="h-px w-12 bg-neutral-900/15" />
-              <span className="font-body text-[9px] uppercase tracking-[0.4em] text-beige-600">Compte gratuit</span>
+              <span className="font-body text-[9px] uppercase tracking-[0.4em] text-beige-600">
+                {IS_BETA ? 'Beta gratuite' : 'Compte gratuit'}
+              </span>
               <div className="h-px w-12 bg-neutral-900/15" />
             </div>
 
@@ -816,13 +865,15 @@ export default function HomePage() {
             </div>
 
             <p className="font-body mx-auto mt-5 max-w-md text-sm leading-relaxed text-neutral-600 sm:text-base">
-              Une seule plateforme pour publier, postuler et échanger, tout commence avec un compte gratuit.
+              {IS_BETA
+                ? 'MODL est en beta : tout est 100 % gratuit. Publiez, postulez et échangez — vos retours nous aident.'
+                : 'Une seule plateforme pour publier, postuler et échanger, tout commence avec un compte gratuit.'}
             </p>
 
             <div className="mt-6">
               <Link href="/auth">
                 <Button variant="beige" size="md" className="px-10 py-3.5 shadow-lg shadow-beige-900/15">
-                  Créer mon compte gratuitement
+                  {IS_BETA ? 'Rejoindre la beta gratuitement' : 'Créer mon compte gratuitement'}
                 </Button>
               </Link>
             </div>
@@ -848,6 +899,7 @@ export default function HomePage() {
               { href: '/legal/conditions-generales', label: 'Conditions générales' },
               { href: '/legal/politique-de-confidentialite', label: 'Confidentialité' },
               { href: '/faq', label: 'FAQ & contact' },
+              { href: '/pricing', label: IS_BETA ? 'Beta gratuite' : 'Tarifs' },
             ].map((link) => (
               <Link
                 key={link.href}

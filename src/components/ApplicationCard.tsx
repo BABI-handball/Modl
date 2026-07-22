@@ -35,7 +35,7 @@ export const ApplicationCard = ({ application, modelProfile, onSwipe }: Applicat
       user.id,
       application.modelUserId,
       application.jobId,
-      job ? `Bonjour ${modelProfile.name}, nous avons accepté votre candidature pour "${job.title}". Serions ravis d'échanger avec vous !` : undefined
+      job ? `Bonjour ${modelProfile.name}, votre profil nous intéresse pour "${job.title}". Seriez-vous disponible pour échanger ?` : undefined
     );
     
     router.push(`/messages/${threadId}`);

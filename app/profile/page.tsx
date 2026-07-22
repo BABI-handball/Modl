@@ -24,6 +24,7 @@ import { ImageUpload } from '@/src/components/ui/ImageUpload';
 import { reviewsStore } from '@/src/lib/reviewsStore';
 import { ReviewsList } from '@/src/components/ReviewsList';
 import { listingQuota } from '@/src/lib/listingQuota';
+import { BETA_COPY, IS_BETA } from '@/src/lib/beta';
 
 export default function ProfilePage() {
   const loadMyJobs = useCallback((ownerId: string) => {
@@ -1200,14 +1201,16 @@ export default function ProfilePage() {
                   {user && (
                     <div className="flex items-center gap-2">
                       <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
-                        listingQuota.remaining(user.id) === 0
+                        !IS_BETA && listingQuota.remaining(user.id) === 0
                           ? 'border-red-200 bg-red-50 text-red-600'
                           : 'border-beige-200 bg-beige-50 text-beige-700'
                       }`}>
                         <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                         </svg>
-                        {listingQuota.remaining(user.id)} restante{listingQuota.remaining(user.id) !== 1 ? 's' : ''} ce mois
+                        {IS_BETA
+                          ? BETA_COPY.listingsLabel
+                          : `${listingQuota.remaining(user.id)} restante${listingQuota.remaining(user.id) !== 1 ? 's' : ''} ce mois`}
                       </span>
                     </div>
                   )}
@@ -1233,9 +1236,11 @@ export default function ProfilePage() {
                 {/* CTA monetisation */}
                 {user && (
                   <div className="rounded-2xl border border-beige-200 bg-gradient-to-br from-beige-50 to-white p-5 space-y-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-beige-600">Publier &amp; booster</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-beige-600">
+                      {IS_BETA ? 'Beta · Annonces illimitées' : 'Publier & booster'}
+                    </p>
                     <div className="flex flex-wrap gap-3">
-                      {listingQuota.remaining(user.id) > 0 ? (
+                      {listingQuota.remaining(user.id) > 0 || IS_BETA ? (
                         <Button variant="beige" size="sm" onClick={() => router.push('/post-job')}>
                           Publier une annonce
                         </Button>
@@ -1245,7 +1250,7 @@ export default function ProfilePage() {
                         </Button>
                       )}
                       <Button variant="outline" size="sm" onClick={() => router.push('/pricing')} className="border-beige-300">
-                        Passer en Pro
+                        {IS_BETA ? 'Beta gratuite' : 'Passer en Pro'}
                       </Button>
                     </div>
                   </div>
@@ -1372,14 +1377,16 @@ export default function ProfilePage() {
                   <CardTitle className="text-3xl font-bold text-neutral-900 tracking-tight">Mes annonces</CardTitle>
                   {user && (
                     <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
-                      listingQuota.remaining(user.id) === 0
+                      !IS_BETA && listingQuota.remaining(user.id) === 0
                         ? 'border-red-200 bg-red-50 text-red-600'
                         : 'border-beige-200 bg-beige-50 text-beige-700'
                     }`}>
                       <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                       </svg>
-                      {listingQuota.remaining(user.id)} restante{listingQuota.remaining(user.id) !== 1 ? 's' : ''} ce mois
+                      {IS_BETA
+                        ? BETA_COPY.listingsLabel
+                        : `${listingQuota.remaining(user.id)} restante${listingQuota.remaining(user.id) !== 1 ? 's' : ''} ce mois`}
                     </span>
                   )}
                 </div>
@@ -1404,9 +1411,11 @@ export default function ProfilePage() {
                 {/* CTA monetisation */}
                 {user && (
                   <div className="rounded-2xl border border-beige-200 bg-gradient-to-br from-beige-50 to-white p-5 space-y-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-beige-600">Publier &amp; booster</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-beige-600">
+                      {IS_BETA ? 'Beta · Annonces illimitées' : 'Publier & booster'}
+                    </p>
                     <div className="flex flex-wrap gap-3">
-                      {listingQuota.remaining(user.id) > 0 ? (
+                      {listingQuota.remaining(user.id) > 0 || IS_BETA ? (
                         <Button variant="beige" size="sm" onClick={() => router.push('/post-job')}>
                           Publier une annonce
                         </Button>
@@ -1416,7 +1425,7 @@ export default function ProfilePage() {
                         </Button>
                       )}
                       <Button variant="outline" size="sm" onClick={() => router.push('/pricing')} className="border-beige-300">
-                        Passer en Pro
+                        {IS_BETA ? 'Beta gratuite' : 'Passer en Pro'}
                       </Button>
                     </div>
                   </div>

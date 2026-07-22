@@ -762,7 +762,7 @@ export const messagesStore = {
       const fromName = fromProfile?.name || 'Nous';
       const toName = toProfile?.name || '';
       
-      messageText = `Salut ${toName}, ton profil nous intéresse pour "${context.listingTitle}". Seriez-vous disponible pour en discuter ?`;
+      messageText = `Bonjour ${toName}, votre profil nous intéresse pour "${context.listingTitle}". Seriez-vous disponible pour échanger ?`;
     } else if (context?.type === 'application' && context.listingTitle) {
       const toProfile = getParticipantSummary(toId);
       const toName = toProfile?.name || '';

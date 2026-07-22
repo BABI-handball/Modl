@@ -1,9 +1,14 @@
 // Quota d'annonces pour les BRAND / PHOTOGRAPHER — localStorage-first
 // Règle : 3 annonces gratuites par mois + listing_credits achetes supplementaires
 // Reset automatique si 30 jours ecoules depuis listings_reset_date
+// Pendant la beta : annonces illimitées
+
+import { IS_BETA } from '@/src/lib/beta';
 
 const QUOTA_KEY = 'modl_listing_quota';
 const FREE_PER_MONTH = 3;
+/** Valeur affichée en beta pour simuler l'illimité */
+export const BETA_UNLIMITED_LISTINGS = 999;
 const RESET_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours
 
 interface QuotaData {
@@ -66,18 +71,21 @@ export const listingQuota = {
 
   /** Nombre total d'annonces autorisees ce mois (1 gratuite + credits achetes) */
   totalAllowed(userId: string): number {
+    if (IS_BETA) return BETA_UNLIMITED_LISTINGS;
     const { listingCredits } = checkAndReset(userId);
     return FREE_PER_MONTH + listingCredits;
   },
 
   /** Nombre d'annonces restantes ce mois */
   remaining(userId: string): number {
+    if (IS_BETA) return BETA_UNLIMITED_LISTINGS;
     const data = checkAndReset(userId);
     return Math.max(0, FREE_PER_MONTH + data.listingCredits - data.listingsPosted);
   },
 
   /** L'utilisateur peut-il encore poster ? */
   canPost(userId: string): boolean {
+    if (IS_BETA) return true;
     return this.remaining(userId) > 0;
   },
 
@@ -87,6 +95,12 @@ export const listingQuota = {
    * Retourne false si la limite etait deja atteinte (securite double).
    */
   recordPost(userId: string): boolean {
+    if (IS_BETA) {
+      const data = checkAndReset(userId);
+      data.listingsPosted += 1;
+      saveQuota(userId, data);
+      return true;
+    }
     const data = checkAndReset(userId);
     if (data.listingsPosted >= FREE_PER_MONTH + data.listingCredits) {
       return false;

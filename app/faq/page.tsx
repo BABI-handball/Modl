@@ -6,33 +6,38 @@ import { useState } from "react";
 const faqs = [
   {
     id: "01",
+    q: "MODL est-elle en beta ? Est-ce gratuit ?",
+    a: "Oui. MODL est actuellement en beta publique : l'accès est 100 % gratuit. Annonces illimitées pour les marques et créatifs, crédits illimités pour les modèles. Vos retours nous aident à améliorer la plateforme. Les tarifs arriveront plus tard.",
+  },
+  {
+    id: "02",
     q: "Où se déroulent les castings sur MODL ?",
     a: "MODL est actuellement dédiée à Paris et à l'Île-de-France. Toutes les annonces sont limitées à Paris, ses arrondissements et les principales villes de la région parisienne.",
   },
   {
-    id: "02",
+    id: "03",
     q: "Est-ce payant pour les modèles / talents ?",
-    a: "Non, la création de profil et la candidature aux annonces sont gratuites pour les modèles et les autres talents pendant la phase de lancement.",
+    a: "Non. Pendant la beta, tout est gratuit pour les modèles : création de profil, déblocage d'annonces et candidatures. Aucune carte bancaire n'est demandée.",
   },
   {
-    id: "03",
+    id: "04",
     q: "Qui paie les modèles et les créatifs ?",
     a: "Les paiements sont gérés directement entre la marque / le créatif qui publie l'annonce et les talents sélectionnés. MODL ne prend pas part aux paiements.",
   },
   {
-    id: "04",
+    id: "05",
     q: "Qui est responsable des contrats et des droits à l'image ?",
     a: "Les contrats, conditions de travail et droits à l'image sont conclus directement entre les marques / créatifs et les talents. MODL fournit uniquement un outil de mise en relation.",
   },
   {
-    id: "05",
+    id: "06",
     q: "Puis-je publier une annonce en dehors de l'Île-de-France ?",
     a: "Non, pour le moment les lieux d'annonce sont limités à Paris et à l'Île-de-France. Cette contrainte permet de concentrer l'offre et la demande sur une même zone.",
   },
   {
-    id: "06",
+    id: "07",
     q: "Comment contacter l'équipe MODL en cas de problème ?",
-    a: "Vous pouvez nous écrire à l'adresse contact@modl.app. Nous faisons au mieux pour répondre rapidement à chaque message.",
+    a: "Vous pouvez nous écrire à l'adresse contact@modl.app. Nous faisons au mieux pour répondre rapidement à chaque message. Pendant la beta, vos retours sont particulièrement bienvenus.",
   },
 ];
 
