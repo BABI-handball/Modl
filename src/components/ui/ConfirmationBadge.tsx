@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/src/lib/utils';
 
 interface ConfirmationBadgeProps {
@@ -10,13 +11,18 @@ interface ConfirmationBadgeProps {
   className?: string;
 }
 
-export const ConfirmationBadge = ({ 
-  show, 
-  message, 
+export const ConfirmationBadge = ({
+  show,
+  message,
   duration = 2000,
-  className 
+  className,
 }: ConfirmationBadgeProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (show) {
@@ -28,25 +34,31 @@ export const ConfirmationBadge = ({
     }
   }, [show, duration]);
 
-  if (!isVisible) return null;
+  if (!mounted || !isVisible) return null;
 
-  return (
+  return createPortal(
     <div
       className={cn(
-        'fixed top-20 left-1/2 z-50 -translate-x-1/2',
-        'flex items-center gap-2 rounded-full',
-        'bg-green-500 text-white px-4 py-2 shadow-lg',
-        'transition-all duration-300',
-        isVisible 
-          ? 'opacity-100 translate-y-0 scale-100' 
-          : 'opacity-0 -translate-y-4 scale-95 pointer-events-none',
+        'pointer-events-none fixed inset-x-0 top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-[200] flex justify-center px-4',
         className
       )}
+      role="status"
+      aria-live="polite"
     >
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-      </svg>
-      <span className="font-semibold text-sm">{message}</span>
-    </div>
+      <div
+        className={cn(
+          'pointer-events-auto flex max-w-[min(92vw,28rem)] items-start gap-2 rounded-full bg-green-500 px-4 py-2.5 text-white shadow-lg transition-all duration-300 sm:items-center',
+          isVisible
+            ? 'translate-y-0 scale-100 opacity-100'
+            : 'pointer-events-none -translate-y-4 scale-95 opacity-0'
+        )}
+      >
+        <svg className="mt-0.5 h-5 w-5 shrink-0 sm:mt-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+        <span className="min-w-0 break-words text-sm font-semibold leading-snug">{message}</span>
+      </div>
+    </div>,
+    document.body
   );
 };
