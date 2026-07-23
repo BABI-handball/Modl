@@ -444,16 +444,41 @@ export default function JobsPage() {
     }
   }, [selectedJobId, user]);
 
-  // Écouter les changements dans localStorage (moins fréquemment pour éviter les re-renders)
+  // Écouter les changements dans localStorage (sans écraser les annonces Supabase)
   useEffect(() => {
+    const mergeJobs = async () => {
+      try {
+        const localJobs = jobsStore.getAll();
+        let supabaseJobs: JobPost[] = [];
+        try {
+          supabaseJobs = await jobsStoreSupabase.getAll();
+        } catch {
+          // garde le local si Supabase indisponible
+        }
+
+        setAllJobs((prev) => {
+          const jobsMap = new Map<string, JobPost>();
+          prev.forEach((job) => jobsMap.set(job.id, job));
+          mockJobPosts.forEach((job) => {
+            if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
+          });
+          localJobs.forEach((job) => jobsMap.set(job.id, job));
+          supabaseJobs.forEach((job) => {
+            if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
+          });
+          return Array.from(jobsMap.values());
+        });
+      } catch {
+        // no-op
+      }
+    };
+
     const handleStorageChange = () => {
-      const createdJobs = jobsStore.getAll();
-      setAllJobs([...mockJobPosts, ...createdJobs]);
+      void mergeJobs();
     };
 
     window.addEventListener('storage', handleStorageChange);
-    // Augmenté à 15 secondes pour réduire les re-renders constants
-    const interval = setInterval(handleStorageChange, 15000);
+    const interval = setInterval(handleStorageChange, 30000);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
