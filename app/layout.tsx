@@ -22,8 +22,13 @@ export const metadata: Metadata = {
   title: "MODL - Plateforme de casting mode",
   description: "Fluidifie les échanges entre mannequins, photographes et marques",
   icons: {
-    // Utiliser le nouveau logo local pour l’icône de l’application
-    icon: '/logo-modl.png',
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
+      { url: "/logo-modl.png", type: "image/png", sizes: "500x500" },
+    ],
+    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
+    shortcut: "/favicon.ico",
   },
 };
 
