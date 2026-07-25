@@ -23,12 +23,12 @@ export const metadata: Metadata = {
   description: "Fluidifie les échanges entre mannequins, photographes et marques",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/modl-favicon.png", type: "image/png", sizes: "512x512" },
       { url: "/favicon.png", type: "image/png", sizes: "32x32" },
-      { url: "/logo-modl.png", type: "image/png", sizes: "500x500" },
+      { url: "/favicon.ico", sizes: "48x48" },
     ],
     apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
-    shortcut: "/favicon.ico",
+    shortcut: "/modl-favicon.png",
   },
 };
 
