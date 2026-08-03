@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL } from "@/src/lib/beta";
 
 export default function ConditionsGeneralesPage() {
   return (
@@ -123,8 +124,8 @@ export default function ConditionsGeneralesPage() {
             <p>
               Pour toute question concernant ces conditions générales d&apos;utilisation, vous pouvez
               nous contacter à{" "}
-              <a href="mailto:contact@modl.app" className="font-medium text-neutral-900 underline underline-offset-2 hover:opacity-70 transition-opacity">
-                contact@modl.app
+              <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-neutral-900 underline underline-offset-2 hover:opacity-70 transition-opacity">
+                {CONTACT_EMAIL}
               </a>
               .
             </p>

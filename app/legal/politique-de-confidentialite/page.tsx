@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL } from "@/src/lib/beta";
 
 export default function PolitiqueConfidentialitePage() {
   return (
@@ -108,8 +109,8 @@ export default function PolitiqueConfidentialitePage() {
             </ul>
             <p>
               Pour exercer vos droits, contactez-nous à{" "}
-              <a href="mailto:privacy@modl.app" className="font-medium text-neutral-900 underline underline-offset-2 hover:opacity-70 transition-opacity">
-                privacy@modl.app
+              <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-neutral-900 underline underline-offset-2 hover:opacity-70 transition-opacity">
+                {CONTACT_EMAIL}
               </a>
               .
             </p>

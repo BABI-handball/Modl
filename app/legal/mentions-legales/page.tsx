@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL } from "@/src/lib/beta";
 
 export default function MentionsLegalesPage() {
   return (
@@ -27,7 +28,7 @@ export default function MentionsLegalesPage() {
               Mentions légales
             </h1>
             <p className="text-sm text-neutral-400">
-              Dernière mise à jour : 12 mars 2026
+              Dernière mise à jour : 3 août 2026
             </p>
           </div>
         </div>
@@ -39,24 +40,44 @@ export default function MentionsLegalesPage() {
 
           <Section number="01" title="Éditeur du site">
             <p>
-              Le site MODL est édité par :<br />
-              <span className="font-semibold text-neutral-900">[Nom de la société / entrepreneur]</span><br />
-              [Forme juridique] au capital de [X €]<br />
-              Siège social : [Adresse complète]<br />
-              Immatriculation : [RCS / SIREN / SIRET]<br />
+              Le site MODL est édité à titre personnel, dans le cadre d&apos;une{" "}
+              <span className="font-semibold text-neutral-900">beta publique</span>.
+            </p>
+            <p>
+              <span className="font-semibold text-neutral-900">Statut</span> : projet en phase
+              de lancement — structuration juridique / immatriculation en cours
+              (micro-entreprise ou société à créer).<br />
+              <span className="font-semibold text-neutral-900">Adresse de correspondance</span> :
+              Paris, France<br />
+              <span className="font-semibold text-neutral-900">SIREN / SIRET</span> : non attribué
+              à ce jour<br />
               Email :{" "}
-              <a href="mailto:contact@modl.app" className="font-medium text-neutral-900 underline underline-offset-2 hover:opacity-70 transition-opacity">
-                contact@modl.app
+              <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-neutral-900 underline underline-offset-2 hover:opacity-70 transition-opacity">
+                {CONTACT_EMAIL}
               </a>
+            </p>
+            <p className="text-sm text-neutral-500">
+              Dès l&apos;immatriculation officielle, ces mentions seront mises à jour avec le nom
+              de l&apos;éditeur, l&apos;adresse et le numéro SIREN / SIRET.
             </p>
           </Section>
 
           <Section number="02" title="Hébergeur">
             <p>
               Le site est hébergé par :<br />
-              <span className="font-semibold text-neutral-900">[Nom de l&apos;hébergeur]</span><br />
-              [Adresse de l&apos;hébergeur]<br />
-              Site web : [URL de l&apos;hébergeur]
+              <span className="font-semibold text-neutral-900">Vercel Inc.</span><br />
+              440 N Barranca Avenue #4133<br />
+              Covina, CA 91723<br />
+              United States<br />
+              Site web :{" "}
+              <a
+                href="https://vercel.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-neutral-900 underline underline-offset-2 hover:opacity-70 transition-opacity"
+              >
+                https://vercel.com
+              </a>
             </p>
           </Section>
 

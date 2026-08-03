@@ -4,6 +4,9 @@
  */
 export const IS_BETA = true;
 
+/** Email public de contact / support (légal, FAQ, etc.) */
+export const CONTACT_EMAIL = 'modl.contactsupport@gmail.com';
+
 export const BETA_COPY = {
   banner:
     'MODL est en beta — accès 100 % gratuit. Vos retours nous aident à améliorer la plateforme.',

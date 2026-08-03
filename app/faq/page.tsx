@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { CONTACT_EMAIL } from "@/src/lib/beta";
 
 const faqs = [
   {
@@ -37,7 +38,7 @@ const faqs = [
   {
     id: "07",
     q: "Comment contacter l'équipe MODL en cas de problème ?",
-    a: "Vous pouvez nous écrire à l'adresse contact@modl.app. Nous faisons au mieux pour répondre rapidement à chaque message. Pendant la beta, vos retours sont particulièrement bienvenus.",
+    a: `Vous pouvez nous écrire à l'adresse ${CONTACT_EMAIL}. Nous faisons au mieux pour répondre rapidement à chaque message. Pendant la beta, vos retours sont particulièrement bienvenus.`,
   },
 ];
 
@@ -151,10 +152,10 @@ export default function FaqPage() {
           <p className="text-sm text-neutral-600 leading-relaxed">
             Une autre question ? Écrivez-nous à{" "}
             <a
-              href="mailto:contact@modl.app"
+              href={`mailto:${CONTACT_EMAIL}`}
               className="font-semibold text-beige-700 underline underline-offset-2 hover:text-beige-800 transition-colors duration-200"
             >
-              contact@modl.app
+              {CONTACT_EMAIL}
             </a>
             . Nous répondons au plus vite.
           </p>
