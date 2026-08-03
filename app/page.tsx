@@ -160,11 +160,11 @@ export default function HomePage() {
         >
           <source src="/hero-background.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-beige-50/16 via-beige-50/20 to-beige-50/28" />
-        <div className="absolute inset-0 z-10 bg-[radial-gradient(ellipse_120%_85%_at_50%_0%,rgba(255,253,245,0.12),transparent_52%)] pointer-events-none" />
-        {/* Lisibilité du bloc bas sans masquer la vidéo */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/25 via-black/15 to-black/35" />
+        <div className="absolute inset-0 z-10 bg-[radial-gradient(ellipse_120%_85%_at_50%_0%,rgba(255,253,245,0.08),transparent_52%)] pointer-events-none" />
+        {/* Voile sombre sous le texte pour garantir le contraste sur la vidéo */}
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[11] h-[min(70%,520px)] bg-gradient-to-t from-[rgba(245,240,232,0.72)] via-[rgba(245,240,232,0.22)] to-transparent sm:h-[min(65%,560px)]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[11] h-[min(78%,600px)] bg-gradient-to-t from-[rgba(18,16,14,0.88)] via-[rgba(18,16,14,0.55)] to-transparent sm:h-[min(72%,640px)]"
           aria-hidden={true}
         />
 
@@ -176,44 +176,44 @@ export default function HomePage() {
                 <img
                   src="/logo-modl.png"
                   alt="MODL"
-                  className="h-52 w-52 object-contain drop-shadow-[0_12px_40px_rgba(0,0,0,0.1)] sm:h-[17rem] sm:w-[17rem] md:h-[19rem] md:w-[19rem] lg:h-[22rem] lg:w-[22rem]"
+                  className="h-52 w-52 object-contain brightness-0 invert drop-shadow-[0_12px_40px_rgba(0,0,0,0.35)] sm:h-[17rem] sm:w-[17rem] md:h-[19rem] md:w-[19rem] lg:h-[22rem] lg:w-[22rem]"
                 />
               </div>
 
-              <p className="font-body mb-4 max-w-xl text-[10px] font-semibold uppercase tracking-[0.38em] text-neutral-600 sm:mb-5 sm:text-[11px] sm:tracking-[0.42em]">
+              <p className="font-body mb-4 max-w-xl text-[10px] font-semibold uppercase tracking-[0.38em] text-beige-100/90 sm:mb-5 sm:text-[11px] sm:tracking-[0.42em]">
                 Casting · Mode · Paris &amp; Île-de-France
               </p>
               {IS_BETA && (
-                <p className="font-body mb-4 max-w-xl text-[11px] font-medium text-beige-800 sm:mb-5 sm:text-sm">
+                <p className="font-body mb-4 max-w-xl text-[11px] font-medium text-beige-300 sm:mb-5 sm:text-sm">
                   {BETA_COPY.heroTag}
                 </p>
               )}
 
-              <h1 className="font-display max-w-[22rem] text-[1.9rem] font-bold leading-[1.06] tracking-tight text-neutral-900 sm:max-w-3xl sm:text-5xl sm:leading-[1.05] md:text-6xl md:leading-[1.02] lg:max-w-4xl lg:text-[3.75rem]">
+              <h1 className="font-display max-w-[22rem] text-[1.9rem] font-bold leading-[1.06] tracking-tight text-beige-50 sm:max-w-3xl sm:text-5xl sm:leading-[1.05] md:text-6xl md:leading-[1.02] lg:max-w-4xl lg:text-[3.75rem]">
                 Structurez vos castings,
                 <br />
-                <span className="font-normal italic text-beige-800">trouvez les talents parfaits.</span>
+                <span className="font-normal italic text-beige-400">trouvez les talents parfaits.</span>
               </h1>
 
-              <p className="font-body mt-5 max-w-md text-pretty text-[0.95rem] leading-relaxed text-neutral-700 sm:mt-6 sm:max-w-lg sm:text-lg sm:leading-[1.65]">
+              <p className="font-body mt-5 max-w-md text-pretty text-[0.95rem] leading-relaxed text-beige-100/85 sm:mt-6 sm:max-w-lg sm:text-lg sm:leading-[1.65]">
                 Une plateforme pour les marques, créatifs et modèles&nbsp;: annonces, candidatures et messages, le tout au même endroit.
               </p>
 
               <div className="mt-8 flex flex-col items-start gap-5 sm:mt-10 sm:flex-row sm:items-center sm:gap-8">
                 <Link href="/auth" className="inline-flex">
-                  <Button size="md" variant="beige" className="px-9 py-3.5 text-sm font-medium shadow-lg shadow-beige-900/20">
+                  <Button size="md" variant="beige" className="px-9 py-3.5 text-sm font-medium shadow-lg shadow-black/30">
                     Commencer
                   </Button>
                 </Link>
                 <button
                   type="button"
                   onClick={() => scrollTo('tarifs')}
-                  className="font-body group inline-flex items-center gap-2 text-sm font-medium text-neutral-800 transition-colors hover:text-beige-800"
+                  className="font-body group inline-flex items-center gap-2 text-sm font-medium text-beige-100 transition-colors hover:text-beige-300"
                 >
-                  <span className="border-b border-neutral-800/25 pb-px transition-[border-color] group-hover:border-beige-700/60">
+                  <span className="border-b border-beige-100/35 pb-px transition-[border-color] group-hover:border-beige-300/70">
                     Voir les tarifs
                   </span>
-                  <span aria-hidden className="text-beige-700 transition-transform group-hover:translate-x-0.5">
+                  <span aria-hidden className="text-beige-400 transition-transform group-hover:translate-x-0.5">
                     →
                   </span>
                 </button>
@@ -223,7 +223,7 @@ export default function HomePage() {
         </div>
 
         <div
-          className="pointer-events-none absolute bottom-6 right-6 z-20 flex flex-col items-end gap-1 text-neutral-600/90 select-none sm:bottom-8 sm:right-10"
+          className="pointer-events-none absolute bottom-6 right-6 z-20 flex flex-col items-end gap-1 text-beige-200/70 select-none sm:bottom-8 sm:right-10"
           aria-hidden="true"
         >
           <span className="font-body text-[9px] tracking-[0.28em] uppercase sm:text-[10px]">Défiler</span>
