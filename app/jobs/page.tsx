@@ -122,44 +122,50 @@ export default function JobsPage() {
     setTimeout(async () => {
       try {
         const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('Timeout')), 2000); // Timeout de 2 secondes
+          setTimeout(() => reject(new Error('Timeout')), 8000);
         });
         
         const supabaseJobs = await Promise.race([
           jobsStoreSupabase.getAll(),
           timeoutPromise
         ]);
+
+        if (supabaseJobs == null) {
+          jobsStore.cleanInappropriate();
+          setAllJobs([...mockJobPosts, ...jobsStore.getAll()]);
+          return;
+        }
         
-        // Fusionner les données Supabase + locales + état courant au lieu de remplacer
-        // pour éviter qu'une annonce fraîchement créée disparaisse après un refresh async.
+        // Fusionner : mocks + Supabase (source de vérité) + local restant
         jobsStore.cleanInappropriate();
+        jobsStore.syncFromRemote(supabaseJobs);
         const localJobs = jobsStore.getAll();
-        setAllJobs((prev) => {
+        setAllJobs(() => {
           const jobsMap = new Map<string, JobPost>();
 
-          // 1) Conserver d'abord ce qui est déjà visible (état courant)
-          prev.forEach((job) => jobsMap.set(job.id, job));
-
-          // 2) Assurer la présence des mocks
           mockJobPosts.forEach((job) => {
-            if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
+            jobsMap.set(job.id, job);
           });
 
-          // 3) Local prioritaire (écrase supabase si même ID)
-          localJobs.forEach((job) => jobsMap.set(job.id, job));
-
-          // 4) Supabase en complément
+          // Supabase écrase les mocks si même ID
           supabaseJobs.forEach((job) => {
+            jobsMap.set(job.id, job);
+          });
+
+          // Local uniquement s'il n'est pas déjà présent (annonce fraîche pas encore sync)
+          localJobs.forEach((job) => {
             if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
           });
 
           return Array.from(jobsMap.values());
         });
       } catch (error) {
-        // Ignorer les erreurs/timeout - on garde les données locales
+        // Ignorer les erreurs/timeout - on garde les données locales nettoyées
         console.warn('Chargement Supabase lent ou échoué, utilisation des données locales');
+        jobsStore.cleanInappropriate();
+        setAllJobs([...mockJobPosts, ...jobsStore.getAll()]);
       }
-    }, 2000); // Délai de 2 secondes pour laisser la page se charger complètement
+    }, 500); // Délai court : laisser hydrater puis privilégier Supabase
   }, [createdJobId]);
 
   useEffect(() => {
@@ -174,15 +180,19 @@ export default function JobsPage() {
       setIsLoadingJobs(true);
       try {
         const supabaseJobs = await jobsStoreSupabase.getAll();
+        if (supabaseJobs == null) {
+          jobsStore.cleanInappropriate();
+          setAllJobs([...mockJobPosts, ...jobsStore.getAll()]);
+          return;
+        }
+        jobsStore.cleanInappropriate();
+        jobsStore.syncFromRemote(supabaseJobs);
         const localJobs = jobsStore.getAll();
-        setAllJobs((prev) => {
+        setAllJobs(() => {
           const jobsMap = new Map<string, JobPost>();
-          prev.forEach((job) => jobsMap.set(job.id, job));
-          mockJobPosts.forEach((job) => {
-            if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
-          });
-          localJobs.forEach((job) => jobsMap.set(job.id, job));
-          supabaseJobs.forEach((job) => {
+          mockJobPosts.forEach((job) => jobsMap.set(job.id, job));
+          supabaseJobs.forEach((job) => jobsMap.set(job.id, job));
+          localJobs.forEach((job) => {
             if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
           });
           return Array.from(jobsMap.values());
@@ -191,15 +201,7 @@ export default function JobsPage() {
         console.error('Erreur lors du rafraîchissement:', error);
         jobsStore.cleanInappropriate();
         const createdJobs = jobsStore.getAll();
-        setAllJobs((prev) => {
-          const jobsMap = new Map<string, JobPost>();
-          prev.forEach((job) => jobsMap.set(job.id, job));
-          mockJobPosts.forEach((job) => {
-            if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
-          });
-          createdJobs.forEach((job) => jobsMap.set(job.id, job));
-          return Array.from(jobsMap.values());
-        });
+        setAllJobs([...mockJobPosts, ...createdJobs]);
       } finally {
         setIsLoadingJobs(false);
       }
@@ -449,23 +451,21 @@ export default function JobsPage() {
     const mergeJobs = async () => {
       try {
         const localJobs = jobsStore.getAll();
-        let supabaseJobs: JobPost[] = [];
-        try {
-          supabaseJobs = await jobsStoreSupabase.getAll();
-        } catch {
-          // garde le local si Supabase indisponible
-        }
+        const supabaseJobs = await jobsStoreSupabase.getAll();
 
         setAllJobs((prev) => {
           const jobsMap = new Map<string, JobPost>();
-          prev.forEach((job) => jobsMap.set(job.id, job));
-          mockJobPosts.forEach((job) => {
-            if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
-          });
-          localJobs.forEach((job) => jobsMap.set(job.id, job));
-          supabaseJobs.forEach((job) => {
-            if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
-          });
+          mockJobPosts.forEach((job) => jobsMap.set(job.id, job));
+          if (supabaseJobs != null) {
+            jobsStore.syncFromRemote(supabaseJobs);
+            supabaseJobs.forEach((job) => jobsMap.set(job.id, job));
+            jobsStore.getAll().forEach((job) => {
+              if (!jobsMap.has(job.id)) jobsMap.set(job.id, job);
+            });
+          } else {
+            prev.forEach((job) => jobsMap.set(job.id, job));
+            localJobs.forEach((job) => jobsMap.set(job.id, job));
+          }
           return Array.from(jobsMap.values());
         });
       } catch {
@@ -550,15 +550,22 @@ export default function JobsPage() {
       createdAt: new Date(),
     };
 
-    applicationsStore.add(newApplication);
-    setShowApplicationModal(false);
-    setHasApplied(true);
-    setApplicationMessage('');
-    
-    setToastMessage('Candidature envoyée avec succès !');
-    setShowToast(true);
-    setIsApplying(false);
-    setTimeout(() => setShowToast(false), 3000);
+    applicationsStore.add(newApplication).then((ok) => {
+      if (!ok) {
+        setToastMessage("Impossible d'envoyer la candidature. Réessaie dans un instant.");
+        setShowToast(true);
+        setIsApplying(false);
+        setTimeout(() => setShowToast(false), 3000);
+        return;
+      }
+      setShowApplicationModal(false);
+      setHasApplied(true);
+      setApplicationMessage('');
+      setToastMessage('Candidature envoyée avec succès !');
+      setShowToast(true);
+      setIsApplying(false);
+      setTimeout(() => setShowToast(false), 3000);
+    });
   };
 
   const handleSubmitApplication = async () => {
@@ -578,15 +585,22 @@ export default function JobsPage() {
       createdAt: new Date(),
     };
 
-    applicationsStore.add(newApplication);
-    setShowApplicationModal(false);
-    setHasApplied(true);
-    setApplicationMessage('');
-    
-    setToastMessage('Candidature envoyée avec succès !');
-    setShowToast(true);
-    setIsApplying(false);
-    setTimeout(() => setShowToast(false), 3000);
+    applicationsStore.add(newApplication).then((ok) => {
+      if (!ok) {
+        setToastMessage("Impossible d'envoyer la candidature. Réessaie dans un instant.");
+        setShowToast(true);
+        setIsApplying(false);
+        setTimeout(() => setShowToast(false), 3000);
+        return;
+      }
+      setShowApplicationModal(false);
+      setHasApplied(true);
+      setApplicationMessage('');
+      setToastMessage('Candidature envoyée avec succès !');
+      setShowToast(true);
+      setIsApplying(false);
+      setTimeout(() => setShowToast(false), 3000);
+    });
   };
 
   const handleSaveToggle = () => {
@@ -631,11 +645,14 @@ export default function JobsPage() {
               showDetails ? "pt-0 max-w-2xl mx-auto" : "pt-6 sm:pt-0 max-w-5xl mx-auto sm:-mt-16"
             )}>
         <div className={cn("mb-4 sm:mb-6 transition-all duration-300", showDetails && "text-center")}>
-          <div className={cn("flex justify-center transition-all duration-300", showDetails ? "mb-1 mt-2" : "mb-0")}>
+          <div className={cn(
+            "flex justify-center items-center transition-all duration-300",
+            showDetails ? "mb-1 mt-2 h-48 sm:h-64" : "mb-0 h-48 sm:h-64 md:h-80 lg:h-96"
+          )}>
             <img
-              src="/logo-modl.png"
+              src="/logo-modl.png?v=4"
               alt="MODL"
-              className={cn("w-auto transition-all duration-300", showDetails ? "h-48 sm:h-64" : "h-48 sm:h-64 md:h-80 lg:h-96")}
+              className={cn("h-auto transition-all duration-300", showDetails ? "w-48 sm:w-64" : "w-48 sm:w-64 md:w-80 lg:w-96")}
             />
           </div>
           <div className={cn("flex items-center gap-3 mb-1 transition-all duration-300", showDetails ? "justify-center" : "justify-start")}>

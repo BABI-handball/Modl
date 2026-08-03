@@ -36,7 +36,7 @@ export default function PostJobPage() {
     referenceImages: [] as string[],
   });
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('Annonce publiee avec succes !');
+  const [toastMessage, setToastMessage] = useState('Annonce publiée avec succès !');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [locationInput, setLocationInput] = useState('');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -98,15 +98,7 @@ export default function PostJobPage() {
     return () => { document.body.style.overflow = 'unset'; };
   }, []);
 
-  // Nettoyage stockage local non essentiel (libère de la place pour annonces/profils)
-  useEffect(() => {
-    try {
-      localStorage.removeItem('modl_messages_v2');
-      localStorage.removeItem('modl_threads_v2');
-    } catch {
-      // no-op
-    }
-  }, []);
+  // (plus de purge des messages au passage sur Publier)
 
   // Rediriger si mauvais role
   useEffect(() => {
@@ -171,7 +163,7 @@ export default function PostJobPage() {
     }
 
     if (!allowedLocations.includes(formData.location)) {
-      alert('Merci de choisir un lieu uniquement a Paris ou en Ile-de-France dans la liste proposee.');
+      alert('Merci de choisir un lieu uniquement à Paris ou en Île-de-France dans la liste proposée.');
       return;
     }
 
@@ -256,9 +248,7 @@ export default function PostJobPage() {
       if (isUuidUser) {
         const savedInSupabase = await jobsStoreSupabase.add(newJob);
         if (!savedInSupabase) {
-          // Garder l'annonce locale visible pour ne pas perdre le travail utilisateur.
-          // On avertit simplement que la synchro serveur a échoué.
-          setToastMessage("Annonce publiée en local, mais la synchronisation Supabase a échoué. Vérifie Supabase (session/RLS/projet actif).");
+          setToastMessage("Annonce enregistrée sur cet appareil, mais pas encore synchronisée en ligne. Réessaie dans un instant.");
           setShowToast(true);
         }
       }
@@ -269,10 +259,14 @@ export default function PostJobPage() {
       setRemaining(newRemaining);
       setCanPost(newRemaining > 0);
 
-      const remainingMsg = newRemaining === 0
-        ? "Il ne te reste plus d'annonce gratuite ce mois-ci."
-        : `Il te reste ${newRemaining} annonce${newRemaining > 1 ? 's' : ''} ce mois-ci.`;
-      setToastMessage(`Annonce publiee ! ${remainingMsg}`);
+      if (IS_BETA) {
+        setToastMessage('Annonce publiée ! (beta : annonces illimitées)');
+      } else {
+        const remainingMsg = newRemaining === 0
+          ? "Il ne te reste plus d'annonce gratuite ce mois-ci."
+          : `Il te reste ${newRemaining} annonce${newRemaining > 1 ? 's' : ''} ce mois-ci.`;
+        setToastMessage(`Annonce publiée ! ${remainingMsg}`);
+      }
       setShowToast(true);
 
       // Reset formulaire
@@ -371,9 +365,9 @@ export default function PostJobPage() {
                       >
                         <TabsList className="w-max sm:w-full inline-flex">
                           <TabsTrigger value="FASHION" className="text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">Mode</TabsTrigger>
-                          <TabsTrigger value="BEAUTY" className="text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">Beaute</TabsTrigger>
+                          <TabsTrigger value="BEAUTY" className="text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">Beauté</TabsTrigger>
                           <TabsTrigger value="COMMERCIAL" className="text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">Commercial</TabsTrigger>
-                          <TabsTrigger value="EDITORIAL" className="text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">Editorial</TabsTrigger>
+                          <TabsTrigger value="EDITORIAL" className="text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">Éditorial</TabsTrigger>
                           <TabsTrigger value="OTHER" className="text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">Autre</TabsTrigger>
                         </TabsList>
                       </Tabs>
@@ -381,7 +375,7 @@ export default function PostJobPage() {
                   </div>
                   <div className="relative">
                     <label className="mb-2 block text-sm font-medium text-neutral-700">
-                      Lieu (Paris / Ile-de-France uniquement)
+                      Lieu (Paris / Île-de-France uniquement)
                     </label>
                     <Input
                       value={locationInput}
@@ -408,7 +402,7 @@ export default function PostJobPage() {
                           </button>
                         ))}
                         <div className="border-t border-beige-100 px-3 py-1.5 text-[11px] text-neutral-400">
-                          Castings limites a Paris et l&apos;Ile-de-France.
+                          Castings limités à Paris et l&apos;Île-de-France.
                         </div>
                       </div>
                     )}
@@ -423,7 +417,7 @@ export default function PostJobPage() {
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-neutral-700">Duree</label>
+                      <label className="mb-2 block text-sm font-medium text-neutral-700">Durée</label>
                       <Input
                         placeholder="ex: 4h, 1 jour"
                         value={formData.duration}
@@ -452,7 +446,7 @@ export default function PostJobPage() {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-neutral-700">Remuneration</label>
+                    <label className="mb-2 block text-sm font-medium text-neutral-700">Rémunération</label>
                     <Tabs
                       defaultValue="PAID"
                       value={formData.payType}
@@ -497,7 +491,7 @@ export default function PostJobPage() {
                       rows={3}
                       value={formData.deliverables}
                       onChange={(e) => setFormData({ ...formData, deliverables: e.target.value })}
-                      placeholder="20 photos retouchees&#10;Droits usage commercial"
+                      placeholder="20 photos retouchées&#10;Droits usage commercial"
                     />
                   </div>
                   <div>

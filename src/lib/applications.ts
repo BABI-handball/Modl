@@ -18,32 +18,40 @@ export const applicationsStore = {
     }
   },
 
-  // Ajouter une candidature
-  add: (application: Application): void => {
-    if (typeof window === 'undefined') return;
+  // Ajouter une candidature — retourne true si OK (local + sync Supabase pour comptes UUID)
+  add: async (application: Application): Promise<boolean> => {
+    if (typeof window === 'undefined') return false;
     try {
       const applications = applicationsStore.getAll();
-      // Vérifier si la candidature existe déjà
       const exists = applications.some(
         (app) => app.jobId === application.jobId && app.modelUserId === application.modelUserId
       );
-      if (!exists) {
-        applications.push(application);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(applications));
-        
-        // Sauvegarder dans Supabase en arrière-plan (sans bloquer)
-        applicationsStoreSupabase.add(application).then((result) => {
-          if (result) {
-            console.log('✅ Candidature synchronisée avec Supabase');
-          } else {
-            console.warn('⚠️ La candidature n\'a pas pu être synchronisée avec Supabase (peut-être un compte dev)');
-          }
-        }).catch((error) => {
-          console.error('❌ Erreur lors de la synchronisation Supabase:', error);
-        });
+      if (exists) return true;
+
+      applications.push(application);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(applications));
+
+      const isUuidUser =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          application.modelUserId
+        );
+      // Annonces mock seed (job1, job2…) : pas de sync serveur attendue
+      const isMockSeedJob = /^job\d+$/i.test(application.jobId);
+
+      if (!isUuidUser || isMockSeedJob) return true;
+
+      const result = await applicationsStoreSupabase.add(application);
+      if (!result) {
+        const rolled = applicationsStore
+          .getAll()
+          .filter((app) => app.id !== application.id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rolled));
+        return false;
       }
+      return true;
     } catch (error) {
       console.error('Error saving application:', error);
+      return false;
     }
   },
 

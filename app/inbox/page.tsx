@@ -7,6 +7,7 @@ import { Application, JobPost, ApplicationStatus, ModelProfile } from '@/src/typ
 import { Candidate } from '@/src/types/candidate';
 import { mockApplications, mockJobPosts, mockModelProfiles } from '@/src/data/mock';
 import { jobsStore } from '@/src/lib/jobs';
+import { jobsStoreSupabase } from '@/src/lib/jobsSupabase';
 import { applicationsStore } from '@/src/lib/applications';
 import { applicationsStoreSupabase } from '@/src/lib/applicationsSupabase';
 import { messagesStore } from '@/src/lib/messagesStore';
@@ -46,77 +47,71 @@ export default function InboxPage() {
   // Charger les candidatures (optimisé pour éviter les re-renders)
   const loadApplications = useCallback(() => {
     if (!user) return;
-    
-    // Filtrer les candidatures pour les jobs de l'utilisateur (mock + créés)
-    const createdJobs = jobsStore.getAll();
-    const allJobs = [...mockJobPosts, ...createdJobs];
-    const userJobs = allJobs.filter((job) => job.ownerUserId === user.id);
-    const userJobIds = userJobs.map(job => job.id);
-    
-    // Charger depuis localStorage d'abord pour un rendu immédiat
-    const storedApplications = applicationsStore.getAll();
+
     const isUuidUser = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
-    const allApplications = isUuidUser ? storedApplications : [...mockApplications, ...storedApplications];
-    
-    // Filtrer pour ne garder que les candidatures des jobs de l'utilisateur
-    const userApplications = allApplications.filter((app) =>
-      userJobIds.includes(app.jobId)
-    );
-    
-    // Convertir les dates string en Date objects si nécessaire
-    const normalizedApplications = userApplications.map(app => ({
-      ...app,
-      createdAt: app.createdAt instanceof Date ? app.createdAt : new Date(app.createdAt),
-    }));
-    
-    setApplications(normalizedApplications);
-    
-    // Charger depuis Supabase en arrière-plan pour synchroniser
-    setTimeout(async () => {
-      try {
-        const supabaseApplications = await applicationsStoreSupabase.getAll();
-        
-        // Filtrer pour les jobs de l'utilisateur
-        const supabaseUserApplications = supabaseApplications.filter((app) =>
-          userJobIds.includes(app.jobId)
-        );
-        
-        // Fusionner avec les données locales (priorité aux locales)
-        const applicationsMap = new Map<string, Application>();
-        
-        // Ajouter d'abord les applications mock
-        mockApplications.forEach(app => {
-          if (userJobIds.includes(app.jobId)) {
-            applicationsMap.set(app.id, app);
-          }
-        });
-        
-        // Ajouter les applications locales (priorité)
-        storedApplications.forEach(app => {
-          if (userJobIds.includes(app.jobId)) {
-            applicationsMap.set(app.id, app);
-          }
-        });
-        
-        // Ajouter les applications Supabase (complètent mais n'écrasent pas)
-        supabaseUserApplications.forEach(app => {
-          if (!applicationsMap.has(app.id)) {
-            applicationsMap.set(app.id, app);
-          }
-        });
-        
-        // Convertir en array et mettre à jour
-        const mergedApplications = Array.from(applicationsMap.values()).map(app => ({
+
+    const applyWithJobIds = (userJobIds: string[], includeMocks: boolean) => {
+      const storedApplications = applicationsStore.getAll();
+      const allApplications = includeMocks
+        ? [...mockApplications, ...storedApplications]
+        : storedApplications;
+
+      const userApplications = allApplications.filter((app) => userJobIds.includes(app.jobId));
+      setApplications(
+        userApplications.map((app) => ({
           ...app,
           createdAt: app.createdAt instanceof Date ? app.createdAt : new Date(app.createdAt),
-        }));
-        
-        setApplications(mergedApplications);
-      } catch (error) {
+        }))
+      );
+    };
+
+    // Rendu immédiat avec jobs locaux + mocks
+    const localJobIds = [...mockJobPosts, ...jobsStore.getAll()]
+      .filter((job) => job.ownerUserId === user.id)
+      .map((job) => job.id);
+    applyWithJobIds(localJobIds, !isUuidUser);
+
+    // Puis hydrater les jobs owner depuis Supabase
+    void (async () => {
+      try {
+        const [remoteJobs, supabaseApplications] = await Promise.all([
+          jobsStoreSupabase.getByOwnerId(user.id),
+          applicationsStoreSupabase.getAll(),
+        ]);
+
+        remoteJobs.forEach((job) => jobsStore.add(job));
+
+        const userJobIds = Array.from(
+          new Set([
+            ...localJobIds,
+            ...remoteJobs.map((j) => j.id),
+          ])
+        );
+
+        const applicationsMap = new Map<string, Application>();
+        if (!isUuidUser) {
+          mockApplications.forEach((app) => {
+            if (userJobIds.includes(app.jobId)) applicationsMap.set(app.id, app);
+          });
+        }
+        applicationsStore.getAll().forEach((app) => {
+          if (userJobIds.includes(app.jobId)) applicationsMap.set(app.id, app);
+        });
+        supabaseApplications.forEach((app) => {
+          if (userJobIds.includes(app.jobId)) applicationsMap.set(app.id, app);
+        });
+
+        setApplications(
+          Array.from(applicationsMap.values()).map((app) => ({
+            ...app,
+            createdAt: app.createdAt instanceof Date ? app.createdAt : new Date(app.createdAt),
+          }))
+        );
+      } catch {
         console.warn('Chargement Supabase des candidatures échoué, utilisation des données locales');
       }
-    }, 2000); // Délai de 2 secondes pour ne pas bloquer
-  }, [user?.id]); // Seulement user.id comme dépendance pour éviter les changements constants
+    })();
+  }, [user?.id]);
 
   // Stocker la référence pour éviter les dépendances circulaires
   loadApplicationsRef.current = loadApplications;

@@ -28,7 +28,7 @@ export default function ConditionsGeneralesPage() {
               Conditions générales d&apos;utilisation
             </h1>
             <p className="text-sm text-neutral-400">
-              Dernière mise à jour : 12 mars 2026
+              Dernière mise à jour : 3 août 2026
             </p>
           </div>
         </div>

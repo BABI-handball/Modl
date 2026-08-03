@@ -115,10 +115,9 @@ export default function JobDetailPage() {
     setShowApplicationModal(true);
   };
 
-  const handleQuickApply = () => {
+  const handleQuickApply = async () => {
     if (!user || !job) return;
 
-    // Créer la candidature rapide sans message
     const newApplication: Application = {
       id: `app-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       jobId: job.id,
@@ -128,10 +127,14 @@ export default function JobDetailPage() {
       createdAt: new Date(),
     };
 
-    // Sauvegarder la candidature
-    applicationsStore.add(newApplication);
+    const ok = await applicationsStore.add(newApplication);
+    if (!ok) {
+      setToastMessage("Impossible d'envoyer la candidature. Réessaie dans un instant.");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      return;
+    }
 
-    // Afficher le feedback
     setShowApplicationModal(false);
     setHasApplied(true);
     setApplicationMessage('');
@@ -140,10 +143,9 @@ export default function JobDetailPage() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handleSubmitApplication = () => {
+  const handleSubmitApplication = async () => {
     if (!user || !job) return;
 
-    // Créer la candidature avec message optionnel
     const newApplication: Application = {
       id: `app-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       jobId: job.id,
@@ -153,8 +155,13 @@ export default function JobDetailPage() {
       createdAt: new Date(),
     };
 
-    // Sauvegarder la candidature
-    applicationsStore.add(newApplication);
+    const ok = await applicationsStore.add(newApplication);
+    if (!ok) {
+      setToastMessage("Impossible d'envoyer la candidature. Réessaie dans un instant.");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      return;
+    }
 
     // Afficher le feedback
     setShowApplicationModal(false);

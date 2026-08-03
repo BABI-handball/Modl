@@ -200,7 +200,7 @@ export const messagesStore = {
       return existingThread.id;
     }
 
-    // Créer un nouveau thread
+    // Créer un nouveau thread — même ID local + Supabase
     const participantA = getParticipantSummary(participantAId);
     const participantB = getParticipantSummary(participantBId);
 
@@ -208,9 +208,14 @@ export const messagesStore = {
       throw new Error('Cannot create thread: participant not found');
     }
 
+    const sharedId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? `thread-${crypto.randomUUID()}`
+        : `thread-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     const now = new Date();
     const newThread: Thread = {
-      id: `thread-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: sharedId,
       participantIds: [participantAId, participantBId],
       participantSummaries: [participantA, participantB],
       createdAt: now,
@@ -221,60 +226,57 @@ export const messagesStore = {
     threads.push(newThread);
     saveThreads(threads);
 
-    console.log('💾 Création du thread local:', {
-      threadId: newThread.id,
-      participantAId,
-      participantBId,
-      listingId,
-      hasInitialMessage: !!initialMessage,
-    });
-
-    // Sauvegarder dans Supabase en arrière-plan
-    // Passer le message initial à Supabase pour qu'il soit créé avec le thread
-    messagesStoreSupabase.getOrCreateThread(participantAId, participantBId, listingId, initialMessage)
+    // Sauvegarder dans Supabase avec le même ID
+    messagesStoreSupabase
+      .getOrCreateThread(participantAId, participantBId, listingId, initialMessage, sharedId)
       .then((supabaseThreadId) => {
-        if (supabaseThreadId) {
-          console.log('✅ Thread créé dans Supabase:', {
-            supabaseThreadId,
-            localThreadId: newThread.id,
-            participantAId,
-            participantBId,
-          });
-        } else {
-          console.warn('⚠️ Thread Supabase non créé (peut-être des comptes dev ou une erreur)');
+        if (supabaseThreadId && supabaseThreadId !== sharedId) {
+          // Thread déjà existant côté serveur : migrer l'ID local
+          messagesStore.migrateThreadId(sharedId, supabaseThreadId);
         }
       })
       .catch((error) => {
-        console.error('❌ Erreur lors de la création Supabase du thread:', error);
-        console.error('Détails:', {
-          code: error?.code,
-          message: error?.message,
-          details: error?.details,
-          hint: error?.hint,
-          participantAId,
-          participantBId,
-        });
+        console.error('Erreur lors de la création Supabase du thread:', error);
       });
 
-    // Créer un message initial localement si fourni
-    // Ne créer le message que si le thread n'existe pas déjà (éviter les doublons)
     if (initialMessage) {
-      // Vérifier qu'un message similaire n'existe pas déjà
       const existingMessages = getMessages();
       const similarMessage = existingMessages.find(
-        m => m.threadId === newThread.id && 
-             m.fromId === participantAId && 
-             m.text.includes(initialMessage.substring(0, 20)) // Vérifier les 20 premiers caractères
+        (m) =>
+          m.threadId === newThread.id &&
+          m.fromId === participantAId &&
+          m.text.includes(initialMessage.substring(0, 20))
       );
-      
+
       if (!similarMessage) {
         messagesStore.sendMessage(newThread.id, initialMessage, participantAId);
-      } else {
-        console.log('💬 Message initial déjà existant, pas de duplication:', similarMessage.id);
       }
     }
 
     return newThread.id;
+  },
+
+  /** Réécrit un thread + ses messages vers un autre ID (alignement Supabase). */
+  migrateThreadId: (fromId: string, toId: string): void => {
+    if (fromId === toId) return;
+    const threads = getThreads();
+    const messages = getMessages();
+
+    const updatedThreads = threads
+      .filter((t) => t.id !== toId)
+      .map((t) => (t.id === fromId ? { ...t, id: toId } : t));
+    saveThreads(updatedThreads);
+
+    const updatedMessages = messages.map((m) =>
+      m.threadId === fromId ? { ...m, threadId: toId } : m
+    );
+    saveMessages(updatedMessages);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('threadMigrated', { detail: { fromId, toId } })
+      );
+    }
   },
 
   // Envoyer un message
@@ -331,64 +333,31 @@ export const messagesStore = {
       saveThreads(threads);
     }
 
-    // Sauvegarder dans Supabase en arrière-plan
-    // D'abord, s'assurer que le thread existe dans Supabase
+    // Sauvegarder dans Supabase — même ID de thread si possible
     const thread = threads.find(t => t.id === threadId);
     if (thread && thread.participantIds.length >= 2) {
-      // Le thread existe localement, synchroniser avec Supabase d'abord
       messagesStoreSupabase.getOrCreateThread(
         thread.participantIds[0],
         thread.participantIds[1],
-        thread.listingId
+        thread.listingId,
+        undefined,
+        threadId
       ).then((supabaseThreadId) => {
-        if (supabaseThreadId) {
-          // Utiliser l'ID Supabase du thread (peut être différent de l'ID local)
-          console.log('📤 Envoi du message dans Supabase avec thread ID:', supabaseThreadId);
-          return messagesStoreSupabase.sendMessage(supabaseThreadId, text, fromId, attachments, replyTo);
-        } else {
-          // Thread Supabase non créé (comptes dev), essayer quand même avec l'ID local
-          console.log('📤 Tentative d\'envoi avec thread ID local:', threadId);
-          return messagesStoreSupabase.sendMessage(threadId, text, fromId, attachments, replyTo);
+        const targetId = supabaseThreadId || threadId;
+        if (supabaseThreadId && supabaseThreadId !== threadId) {
+          messagesStore.migrateThreadId(threadId, supabaseThreadId);
         }
-      }).then((supabaseMessage) => {
-        if (supabaseMessage) {
-          console.log('✅ Message envoyé dans Supabase:', {
-            messageId: supabaseMessage.id,
-            threadId: supabaseMessage.threadId,
-            text: supabaseMessage.text.substring(0, 50) + '...'
-          });
-        } else {
-          console.warn('⚠️ Message non envoyé dans Supabase (peut-être un compte dev ou thread non synchronisé)');
-        }
+        return messagesStoreSupabase.sendMessage(targetId, text, fromId, attachments, replyTo);
       }).catch((error) => {
-        // Ne pas logger l'erreur si c'est juste un compte dev (UUID invalide)
         if (error && typeof error === 'object' && 'message' in error) {
           const errorMsg = String(error.message);
           if (!errorMsg.includes('UUID') && !errorMsg.includes('uuid')) {
-            console.error('❌ Échec de l\'envoi Supabase du message:', error);
+            console.error('Échec de l\'envoi Supabase du message:', error);
           }
-        } else {
-          console.error('❌ Erreur lors de l\'envoi Supabase:', error);
         }
       });
     } else {
-      // Thread non trouvé localement ou participants manquants, essayer quand même avec l'ID local
-      console.log('📤 Tentative d\'envoi avec thread ID local (thread non trouvé localement):', threadId);
-      messagesStoreSupabase.sendMessage(threadId, text, fromId, attachments, replyTo)
-        .then((supabaseMessage) => {
-          if (supabaseMessage) {
-            console.log('✅ Message envoyé dans Supabase:', supabaseMessage.id);
-          } else {
-            console.warn('⚠️ Message non envoyé dans Supabase (thread non trouvé)');
-          }
-        })
-        .catch((error) => {
-          // Ignorer les erreurs silencieusement pour les comptes dev
-          const errorMsg = error?.message || String(error);
-          if (!errorMsg.includes('UUID') && !errorMsg.includes('uuid')) {
-            console.error('❌ Erreur lors de l\'envoi Supabase:', error);
-          }
-        });
+      messagesStoreSupabase.sendMessage(threadId, text, fromId, attachments, replyTo).catch(() => {});
     }
 
     return newMessage;
@@ -472,32 +441,7 @@ export const messagesStore = {
             // Thread avec mêmes participants existe déjà, mettre à jour l'ID local si nécessaire
             const existingThread = threadsByParticipantsMap.get(participantsKey);
             if (existingThread && existingThread.id !== thread.id) {
-              console.log('🔗 Thread dupliqué détecté, fusion:', {
-                localId: existingThread.id,
-                supabaseId: thread.id,
-                participants: thread.participantIds,
-              });
-              // IMPORTANT: garder l'ID local du thread ouvert côté UI.
-              // Si on bascule brutalement vers l'ID Supabase, la page /messages/[threadId]
-              // avec l'ancien ID est expulsée vers /messages après quelques secondes.
-              const allThreads = getThreads();
-              const mergedThread: Thread = {
-                ...existingThread,
-                ...thread,
-                id: existingThread.id,
-                // Préserver les infos participant locales si Supabase n'a pas encore de résumés complets.
-                participantSummaries:
-                  thread.participantSummaries && thread.participantSummaries.length > 0
-                    ? thread.participantSummaries
-                    : existingThread.participantSummaries,
-                // Préserver le dernier message local si plus récent/disponible.
-                lastMessage: thread.lastMessage || existingThread.lastMessage,
-              };
-
-              const replacedThreads = allThreads
-                .filter(t => t.id !== existingThread.id && t.id !== thread.id)
-                .concat(mergedThread);
-              saveThreads(replacedThreads);
+              messagesStore.migrateThreadId(existingThread.id, thread.id);
             }
           }
         });

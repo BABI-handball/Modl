@@ -1230,7 +1230,7 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-lg text-neutral-500 mb-6 font-medium">Vous n&apos;avez pas encore publie d&apos;annonce</p>
+                    <p className="text-lg text-neutral-500 mb-6 font-medium">Vous n&apos;avez pas encore publié d&apos;annonce</p>
                   </div>
                 )}
                 {/* CTA monetisation */}
@@ -1246,7 +1246,7 @@ export default function ProfilePage() {
                         </Button>
                       ) : (
                         <Button variant="outline" size="sm" onClick={() => router.push('/post-job')} className="border-red-200 text-red-600 hover:bg-red-50">
-                          Quota atteint — Acheter des credits
+                          Quota atteint — Acheter des crédits
                         </Button>
                       )}
                       <Button variant="outline" size="sm" onClick={() => router.push('/pricing')} className="border-beige-300">
@@ -1405,7 +1405,7 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-lg text-neutral-500 mb-6 font-medium">Vous n&apos;avez pas encore publie d&apos;annonce</p>
+                    <p className="text-lg text-neutral-500 mb-6 font-medium">Vous n&apos;avez pas encore publié d&apos;annonce</p>
                   </div>
                 )}
                 {/* CTA monetisation */}
@@ -1421,7 +1421,7 @@ export default function ProfilePage() {
                         </Button>
                       ) : (
                         <Button variant="outline" size="sm" onClick={() => router.push('/post-job')} className="border-red-200 text-red-600 hover:bg-red-50">
-                          Quota atteint — Acheter des credits
+                          Quota atteint — Acheter des crédits
                         </Button>
                       )}
                       <Button variant="outline" size="sm" onClick={() => router.push('/pricing')} className="border-beige-300">

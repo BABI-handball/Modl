@@ -10,7 +10,7 @@ export const jobsStoreSupabase = {
   /**
    * Récupérer toutes les annonces
    */
-  getAll: async (): Promise<JobPost[]> => {
+  getAll: async (): Promise<JobPost[] | null> => {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('job_posts')
@@ -22,7 +22,7 @@ export const jobsStoreSupabase = {
         'Supabase annonces indisponible (données locales utilisées):',
         error.message ?? error.code ?? String(error)
       );
-      return [];
+      return null;
     }
 
     // Convertir les données Supabase en format JobPost

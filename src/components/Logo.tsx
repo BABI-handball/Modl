@@ -13,19 +13,30 @@ interface LogoProps {
   rounded?: boolean;
 }
 
-// Logo local dans public/
+// Logo local dans public/ (wordmark recadré — ratio ~363×77)
 const LOGO_PATH = '/logo-modl.png';
+const LOGO_ASPECT = 77 / 363;
 
 export const Logo = ({ className, size = 'md', showText = false, href, rounded = false }: LogoProps) => {
   const [imageError, setImageError] = useState(false);
-  
-  const sizeClasses = {
+
+  // Largeurs = anciennes boîtes carrées, pour garder la même taille visuelle du wordmark
+  const widthBySize = {
+    sm: 32,
+    md: 48,
+    lg: 128,
+    xl: 192,
+    '2xl': 256,
+    '3xl': 320,
+  } as const;
+
+  const boxClasses = {
     sm: 'h-8 w-8',
     md: 'h-12 w-12',
-    lg: 'h-32 w-32', // Très agrandi pour la page d'accueil
-    xl: 'h-48 w-48', // Encore plus grand pour la page d'accueil
-    '2xl': 'h-64 w-64', // Très très grand pour la page d'accueil
-    '3xl': 'h-80 w-80', // Encore plus grand pour la page d'accueil
+    lg: 'h-32 w-32',
+    xl: 'h-48 w-48',
+    '2xl': 'h-64 w-64',
+    '3xl': 'h-80 w-80',
   };
 
   const textSizeClasses = {
@@ -37,25 +48,28 @@ export const Logo = ({ className, size = 'md', showText = false, href, rounded =
     '3xl': 'text-5xl',
   };
 
-  const imageSize = size === 'sm' ? 32 : size === 'md' ? 48 : size === 'lg' ? 128 : size === 'xl' ? 192 : size === '2xl' ? 256 : 320; // Très agrandi pour 3xl
+  const imageWidth = widthBySize[size];
+  const imageHeight = Math.max(1, Math.round(imageWidth * LOGO_ASPECT));
 
   const content = (
     <div className={cn('flex items-center gap-3', className)}>
       {!imageError ? (
-        <Image
-          src={LOGO_PATH}
-          alt="MODL Logo"
-          width={imageSize}
-          height={imageSize}
-          className={cn('object-contain', sizeClasses[size], rounded && 'rounded-2xl')}
-          onError={() => {
-            console.warn('Logo image failed to load, using fallback');
-            setImageError(true);
-          }}
-          priority={size === 'lg' || size === 'xl' || size === '2xl' || size === '3xl'}
-        />
+        <div className={cn('flex items-center justify-center', boxClasses[size])}>
+          <Image
+            src={LOGO_PATH}
+            alt="MODL Logo"
+            width={imageWidth}
+            height={imageHeight}
+            className={cn('h-auto w-full object-contain', rounded && 'rounded-2xl')}
+            onError={() => {
+              console.warn('Logo image failed to load, using fallback');
+              setImageError(true);
+            }}
+            priority={size === 'lg' || size === 'xl' || size === '2xl' || size === '3xl'}
+          />
+        </div>
       ) : (
-        <div className={cn('flex items-center justify-center rounded-full bg-black text-white font-bold shadow-md', sizeClasses[size])}>
+        <div className={cn('flex items-center justify-center rounded-full bg-black text-white font-bold shadow-md', boxClasses[size])}>
           M
         </div>
       )}

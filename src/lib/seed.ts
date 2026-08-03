@@ -355,7 +355,7 @@ export const seedDemoData = () => {
   ];
 
   applications.forEach(app => {
-    applicationsStore.add(app);
+    applicationsStore.add(app).catch(() => {});
   });
 
   // 4. Seed des threads de messages

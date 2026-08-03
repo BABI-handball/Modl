@@ -175,7 +175,7 @@ export default function AuthPage() {
           return;
         }
         if (!isAdultConfirmed) {
-          setError('Vous devez certifier avoir plus de 18 ans pour créer un compte modèle.');
+          setError('Vous devez certifier avoir 18 ans ou plus pour créer un compte.');
           setIsLoading(false);
           return;
         }
@@ -309,15 +309,15 @@ export default function AuthPage() {
         {/* Logo MODL */}
         <div
           className={`flex justify-center overflow-hidden transition-all duration-500 ease-out ${
-            isLogin ? 'max-h-40 opacity-100 mb-0' : 'max-h-0 opacity-0 -mb-2'
+            isLogin ? 'max-h-28 opacity-100 mb-6 sm:max-h-32 sm:mb-8' : 'max-h-0 opacity-0 -mb-2'
           }`}
           aria-hidden={!isLogin}
         >
           <Link href="/" className="cursor-pointer transition-opacity duration-300 hover:opacity-80">
             <img 
-              src="/logo-modl.png" 
+              src="/logo-modl.png?v=4" 
               alt="MODL" 
-              className="-translate-y-24 sm:-translate-y-28 h-40 w-40 sm:h-52 sm:w-52 md:h-64 md:w-64 lg:h-80 lg:w-80 object-contain"
+              className="h-auto w-40 object-contain sm:w-52 md:w-56"
             />
           </Link>
         </div>
@@ -424,7 +424,7 @@ export default function AuthPage() {
                       />
                       <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
                         <span className="leading-snug">
-                          Je certifie avoir <strong>18 ans ou plus</strong> pour créer un compte modèle.
+                          Je certifie avoir <strong>18 ans ou plus</strong>.
                         </span>
                         <span className="mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-beige-100 text-beige-700 transition-colors group-hover:bg-beige-200">
                           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

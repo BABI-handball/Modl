@@ -314,7 +314,7 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* Page d’accueil : scroll interne ; pas de « bounce » / bande blanche en haut ou en bas */
+/* Page d’accueil : scroll interne ; hauteur = viewport moins le bandeau beta */
 .home-scroll-root {
   height: 100vh;
   max-height: 100vh;
@@ -326,6 +326,13 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
+}
+
+body:has(.beta-banner) .home-scroll-root {
+  height: calc(100vh - 2.5rem);
+  max-height: calc(100vh - 2.5rem);
+  height: calc(100dvh - 2.5rem);
+  max-height: calc(100dvh - 2.5rem);
 }
 
 /* Masquer l'ascenseur visuel tout en gardant le scroll */

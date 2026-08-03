@@ -69,6 +69,17 @@ export default function ChatPage() {
     loadThread();
   }, [loadThread]);
 
+  // Si le thread local est aligné sur un ID Supabase, suivre la navigation
+  useEffect(() => {
+    const onMigrated = (event: Event) => {
+      const detail = (event as CustomEvent<{ fromId: string; toId: string }>).detail;
+      if (!detail || detail.fromId !== threadId) return;
+      router.replace(`/messages/${detail.toId}`);
+    };
+    window.addEventListener('threadMigrated', onMigrated);
+    return () => window.removeEventListener('threadMigrated', onMigrated);
+  }, [threadId, router]);
+
   // Auto-scroll en bas
   useEffect(() => {
     if (messages.length > 0) {

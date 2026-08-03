@@ -5,6 +5,7 @@ import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { JobPost } from '@/src/types';
 import { jobsStore } from '@/src/lib/jobs';
+import { IS_BETA } from '@/src/lib/beta';
 
 interface BoostModalProps {
   isOpen: boolean;
@@ -32,15 +33,11 @@ export const BoostModal = ({ isOpen, onClose, job, onBoostSuccess }: BoostModalP
 
   const handleBoost = async () => {
     setIsProcessing(true);
+    await new Promise((resolve) => setTimeout(resolve, IS_BETA ? 400 : 1500));
 
-    // Simuler un paiement (dans une vraie app, intégration Stripe/PayPal)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Calculer la date de fin du boost
     const boostUntil = new Date();
     boostUntil.setDate(boostUntil.getDate() + selectedOption.days);
 
-    // Mettre à jour l'annonce
     jobsStore.update(job.id, {
       isBoosted: true,
       boostUntil: boostUntil,
@@ -54,7 +51,6 @@ export const BoostModal = ({ isOpen, onClose, job, onBoostSuccess }: BoostModalP
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Booster votre annonce">
       <div className="space-y-5">
-        {/* Info de l'annonce */}
         <div className="p-3 bg-beige-50 rounded-lg border border-beige-200">
           <h3 className="text-base font-bold text-neutral-900 mb-1">{job.title}</h3>
           <p className="text-xs text-neutral-600">
@@ -62,7 +58,13 @@ export const BoostModal = ({ isOpen, onClose, job, onBoostSuccess }: BoostModalP
           </p>
         </div>
 
-        {/* Options de boost */}
+        {IS_BETA && (
+          <div className="rounded-lg border border-beige-400/50 bg-beige-100 px-3 py-2.5 text-xs leading-relaxed text-neutral-800">
+            <strong className="font-semibold">Beta gratuite :</strong> le boost est offert pour l’instant.
+            Il sera payant plus tard (à partir de {boostOptions[0].price}€).
+          </div>
+        )}
+
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-neutral-700">
             Choisissez la durée du boost
@@ -84,7 +86,16 @@ export const BoostModal = ({ isOpen, onClose, job, onBoostSuccess }: BoostModalP
                     {option.label}
                   </div>
                   <div className="text-lg font-bold text-beige-600">
-                    {option.price}€
+                    {IS_BETA ? (
+                      <>
+                        <span className="mr-1.5 text-sm font-medium text-neutral-400 line-through">
+                          {option.price}€
+                        </span>
+                        Gratuit
+                      </>
+                    ) : (
+                      `${option.price}€`
+                    )}
                   </div>
                 </div>
               </button>
@@ -92,37 +103,15 @@ export const BoostModal = ({ isOpen, onClose, job, onBoostSuccess }: BoostModalP
           </div>
         </div>
 
-        {/* Avantages du boost */}
         <div className="p-3 bg-gradient-to-br from-beige-100 to-beige-50 rounded-lg border border-beige-300">
-          <h4 className="text-xs font-bold text-neutral-900 mb-2 flex items-center gap-1.5">
-            <svg className="h-4 w-4 text-beige-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-            Avantages du boost
-          </h4>
+          <h4 className="text-xs font-bold text-neutral-900 mb-2">Avantages du boost</h4>
           <ul className="space-y-1.5 text-xs text-neutral-700">
-            <li className="flex items-start gap-1.5">
-              <svg className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Apparaît en premier dans les résultats</span>
-            </li>
-            <li className="flex items-start gap-1.5">
-              <svg className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Badge "Sponsorisé" pour plus de visibilité</span>
-            </li>
-            <li className="flex items-start gap-1.5">
-              <svg className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Jusqu'à 3x plus de candidatures</span>
-            </li>
+            <li>Apparaît en premier dans les résultats</li>
+            <li>Badge « Sponsorisé » pour plus de visibilité</li>
+            <li>Jusqu&apos;à 3x plus de candidatures</li>
           </ul>
         </div>
 
-        {/* Résumé et paiement */}
         <div className="p-4 bg-neutral-900 text-white rounded-lg">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs opacity-90">Durée du boost</span>
@@ -130,30 +119,27 @@ export const BoostModal = ({ isOpen, onClose, job, onBoostSuccess }: BoostModalP
           </div>
           <div className="flex items-center justify-between mb-4 pt-3 border-t border-white/20">
             <span className="text-sm font-semibold">Total</span>
-            <span className="text-2xl font-bold">{selectedOption.price}€</span>
+            <span className="text-2xl font-bold">
+              {IS_BETA ? '0€' : `${selectedOption.price}€`}
+            </span>
           </div>
           <Button
             onClick={handleBoost}
             disabled={isProcessing}
             className="w-full bg-beige-500 hover:bg-beige-600 text-white font-bold py-3 text-base"
           >
-            {isProcessing ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Traitement en cours...
-              </span>
-            ) : (
-              `Booster pour ${selectedOption.price}€`
-            )}
+            {isProcessing
+              ? 'Activation…'
+              : IS_BETA
+                ? 'Booster gratuitement (beta)'
+                : `Booster pour ${selectedOption.price}€`}
           </Button>
         </div>
 
-        {/* Note légale */}
         <p className="text-xs text-neutral-500 text-center -mt-2">
-          Le paiement est sécurisé. Vous pouvez annuler le boost à tout moment.
+          {IS_BETA
+            ? 'Pendant la beta, aucun paiement n’est demandé. Les tarifs arriveront plus tard.'
+            : 'Le paiement est sécurisé. Vous pouvez annuler le boost à tout moment.'}
         </p>
       </div>
     </Modal>

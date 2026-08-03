@@ -10,7 +10,7 @@ import { createClient } from '@/src/lib/supabase/client';
 
 /**
  * Hook qui vérifie que l'utilisateur est authentifié et a complété l'onboarding
- * Redirige vers /onboarding si ce n'est pas le cas
+ * Redirige vers /auth si non connecté, vers /onboarding si profil incomplet (comptes locaux)
  */
 export const useRequireUser = (): { user: User; isLoading: boolean } => {
   const router = useRouter();
@@ -24,12 +24,11 @@ export const useRequireUser = (): { user: User; isLoading: boolean } => {
     // Éviter les redirections multiples
     if (hasRedirected) return;
 
-    // Si pas d'utilisateur après le chargement, rediriger
+    // Si pas d'utilisateur après le chargement, rediriger vers la connexion
     if (!user) {
       setHasRedirected(true);
-      // Utiliser setTimeout pour éviter les problèmes de navigation pendant le rendu
       setTimeout(() => {
-        router.replace('/onboarding');
+        router.replace('/auth');
       }, 100);
       return;
     }

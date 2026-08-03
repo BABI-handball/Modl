@@ -81,7 +81,8 @@ export const messagesStoreSupabase = {
     participantAId: string,
     participantBId: string,
     listingId?: string,
-    initialMessage?: string
+    initialMessage?: string,
+    preferredId?: string
   ): Promise<string> => {
     const supabase = createClient();
     
@@ -90,13 +91,10 @@ export const messagesStoreSupabase = {
     const isUUIDB = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(participantBId);
     
     if (!isUUIDA || !isUUIDB) {
-      console.warn('⚠️ Impossible de créer un thread Supabase: les participants ne sont pas des UUIDs valides (comptes dev)');
-      return ''; // Retourner une chaîne vide pour indiquer qu'on ne peut pas créer dans Supabase
+      console.warn('Impossible de créer un thread Supabase: participants non-UUID');
+      return '';
     }
 
-    // Chercher un thread existant entre ces deux participants
-    // Utiliser une approche directe : récupérer tous les threads et filtrer côté client
-    // (La fonction RPC cause des erreurs 406, donc on utilise cette approche plus fiable)
     const { data: allThreads, error: threadsError } = await supabase
       .from('message_threads')
       .select('*')
@@ -118,16 +116,11 @@ export const messagesStoreSupabase = {
       }
     }
 
-    // Créer un nouveau thread
-    const threadId = `thread-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    console.log('📤 Tentative de création du thread dans Supabase:', {
-      threadId,
-      participantAId,
-      participantBId,
-      listingId,
-      hasInitialMessage: !!initialMessage,
-    });
+    const threadId =
+      preferredId ||
+      (typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? `thread-${crypto.randomUUID()}`
+        : `thread-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
     
     const { data: newThread, error: createError } = await supabase
       .from('message_threads')
@@ -139,23 +132,12 @@ export const messagesStoreSupabase = {
       .single();
 
     if (createError) {
-      console.error('❌ Erreur lors de la création du thread:', createError);
-      console.error('Détails:', {
-        code: createError.code,
-        message: createError.message,
-        details: createError.details,
-        hint: createError.hint,
-        threadId,
-        participantAId,
-        participantBId,
-      });
+      console.error('Erreur lors de la création du thread:', createError);
       return '';
     }
 
-    console.log('✅ Thread créé avec succès dans Supabase:', newThread);
-
-    // Créer un message initial si fourni
-    if (initialMessage && newThread) {
+    // Message initial uniquement si on crée le thread (évite doublon avec le store local)
+    if (initialMessage && newThread && !preferredId) {
       await messagesStoreSupabase.sendMessage(threadId, initialMessage, participantAId);
     }
 

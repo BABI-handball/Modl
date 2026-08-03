@@ -157,23 +157,51 @@ export const jobsStore = {
     }
   },
 
-  // Nettoyer les annonces inappropriées
+  // Nettoyer les annonces inappropriées / tests locaux
   cleanInappropriate: (): void => {
     if (typeof window === 'undefined') return;
     try {
       const jobs = jobsStore.getAll();
       const inappropriateTerms = ['pipi', 'caca'];
+      const testTitlePatterns = [
+        /^oui$/i,
+        /^non$/i,
+        /^shooting\s*(oui|non)$/i,
+        /nu artistique/i,
+        /^shooting streetwear$/i,
+        /^shooting test/i,
+      ];
       const cleaned = jobs.filter((job) => {
-        const title = job.title.toLowerCase();
-        const description = job.description.toLowerCase();
-        return !inappropriateTerms.some((term) => title.includes(term) || description.includes(term));
+        const title = (job.title || '').trim();
+        const titleLower = title.toLowerCase();
+        const description = (job.description || '').toLowerCase();
+        if (inappropriateTerms.some((term) => titleLower.includes(term) || description.includes(term))) {
+          return false;
+        }
+        if (testTitlePatterns.some((re) => re.test(title))) {
+          return false;
+        }
+        return true;
       });
-      
+
       if (cleaned.length !== jobs.length) {
         persistJobs(cleaned);
       }
     } catch (error) {
       console.error('Error cleaning jobs:', error);
+    }
+  },
+
+  /** Quand Supabase répond, on ne garde en local que ce qui existe encore côté serveur. */
+  syncFromRemote: (remoteJobs: JobPost[]): void => {
+    if (typeof window === 'undefined') return;
+    try {
+      const remoteIds = new Set(remoteJobs.map((j) => j.id));
+      const localJobs = jobsStore.getAll();
+      const kept = localJobs.filter((j) => remoteIds.has(j.id));
+      persistJobs(kept);
+    } catch (error) {
+      console.error('Error syncing local jobs from remote:', error);
     }
   },
 };

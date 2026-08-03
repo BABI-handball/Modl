@@ -52,7 +52,7 @@ const plans = [
     tagline: 'Pour commencer',
     monthlyPrice: 0,
     yearlyPrice: 0,
-    features: ['5 annonces par mois', 'Accès aux candidatures', 'Profil de base'],
+    features: ['3 annonces par mois', 'Accès aux candidatures', 'Profil de base'],
     cta: 'Commencer gratuitement',
     ctaVariant: 'outline' as const,
     highlighted: false,
@@ -145,7 +145,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════════
           1. HERO
       ══════════════════════════════════════════════════════════ */}
-      <section className="relative flex h-[100dvh] min-h-[100dvh] shrink-0 snap-start flex-col overflow-x-clip overflow-y-hidden">
+      <section className="relative flex h-full min-h-full shrink-0 snap-start flex-col overflow-x-clip overflow-y-hidden">
         {/* Pas de poster : évite d’afficher une image fixe si la vidéo met du temps à charger */}
         <div className="absolute inset-0 z-0 bg-[#1a1916]" aria-hidden />
         <video
@@ -171,12 +171,12 @@ export default function HomePage() {
         <div className="relative z-20 flex min-h-0 flex-1 flex-col justify-end">
           <div className="w-full max-w-6xl px-5 pb-10 pt-8 sm:px-10 sm:pb-14 lg:px-14 lg:pb-16">
             <div className="animate-fade-in text-left">
-              {/* Logo — plus grand, ancré comme une une de magazine */}
-              <div className="mb-6 sm:mb-8">
+              {/* Logo — emplacement inchangé, image recadrée (sélection propre) */}
+              <div className="mb-6 flex h-52 w-52 items-center sm:mb-8 sm:h-[17rem] sm:w-[17rem] md:h-[19rem] md:w-[19rem] lg:h-[22rem] lg:w-[22rem]">
                 <img
-                  src="/logo-modl-on-dark.png?v=3"
+                  src="/logo-modl-on-dark.png?v=4"
                   alt="MODL"
-                  className="h-52 w-52 object-contain drop-shadow-[0_12px_40px_rgba(0,0,0,0.25)] sm:h-[17rem] sm:w-[17rem] md:h-[19rem] md:w-[19rem] lg:h-[22rem] lg:w-[22rem]"
+                  className="h-auto w-full object-contain drop-shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
                 />
               </div>
 
@@ -303,7 +303,7 @@ export default function HomePage() {
                 <ol className="divide-y divide-white/8">
                   {[
                     ['Casting publié', 'en moins de 2 minutes'],
-                    ['Profils vérifiés', 'et sérieux'],
+                    ['Profils sérieux', 'et soignés'],
                     ['Candidatures', 'centralisées'],
                     ['Shootings', 'planifiés facilement'],
                   ].map(([title, sub], i) => (
@@ -887,8 +887,8 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════════ */}
       <footer className="snap-start bg-neutral-950 px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 sm:flex-row sm:gap-3">
-          <Link href="/" className="shrink-0 leading-none opacity-70 transition-opacity hover:opacity-100">
-            <img src="/logo-modl-on-dark.png?v=3" alt="MODL" className="h-32 w-32 object-contain sm:h-36 sm:w-36" />
+          <Link href="/" className="flex h-32 w-32 shrink-0 items-center leading-none opacity-70 transition-opacity hover:opacity-100 sm:h-36 sm:w-36">
+            <img src="/logo-modl-on-dark.png?v=4" alt="MODL" className="h-auto w-full object-contain" />
           </Link>
           <nav
             className="flex max-w-full flex-wrap justify-center gap-x-3 gap-y-1 sm:justify-end sm:gap-x-4 sm:gap-y-0"
