@@ -125,15 +125,42 @@ export default function HomePage() {
     };
   }, []);
 
-  // Bloque le scroll du document (globals utilise overflow-y: auto !important sur html/body)
+  // Bloque le scroll du document et colle la landing au viewport (pas de bande claire sous le hero)
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
+    const root = document.querySelector('.home-scroll-root') as HTMLElement | null;
     html.style.setProperty('overflow', 'hidden', 'important');
+    html.style.setProperty('background-color', '#0a0a0a', 'important');
     body.style.setProperty('overflow', 'hidden', 'important');
+    body.style.setProperty('background-color', '#0a0a0a', 'important');
+    body.style.setProperty('display', 'flex', 'important');
+    body.style.setProperty('flex-direction', 'column', 'important');
+    body.style.setProperty('height', '100dvh', 'important');
+    body.style.setProperty('max-height', '100dvh', 'important');
+    if (root) {
+      root.style.setProperty('flex', '1 1 auto', 'important');
+      root.style.setProperty('min-height', '0', 'important');
+      root.style.setProperty('height', 'auto', 'important');
+      root.style.setProperty('max-height', 'none', 'important');
+      root.style.setProperty('background-color', '#0a0a0a', 'important');
+    }
     return () => {
       html.style.removeProperty('overflow');
+      html.style.removeProperty('background-color');
       body.style.removeProperty('overflow');
+      body.style.removeProperty('background-color');
+      body.style.removeProperty('display');
+      body.style.removeProperty('flex-direction');
+      body.style.removeProperty('height');
+      body.style.removeProperty('max-height');
+      if (root) {
+        root.style.removeProperty('flex');
+        root.style.removeProperty('min-height');
+        root.style.removeProperty('height');
+        root.style.removeProperty('max-height');
+        root.style.removeProperty('background-color');
+      }
     };
   }, []);
 
@@ -141,7 +168,7 @@ export default function HomePage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <div className="home-scroll-root relative z-[1]">
+    <div className="home-scroll-root relative z-[1] min-h-0 flex-1 bg-[#0a0a0a]">
       {/* ══════════════════════════════════════════════════════════
           1. HERO
       ══════════════════════════════════════════════════════════ */}

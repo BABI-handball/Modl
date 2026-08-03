@@ -38,12 +38,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
-      <body className={`${inter.variable} ${playfair.variable} antialiased`} style={{ backgroundColor: '#faf9f7', position: 'relative' }}>
+    <html lang="fr" className="h-full">
+      <body
+        className={`${inter.variable} ${playfair.variable} antialiased flex min-h-dvh flex-col bg-[#faf9f7]`}
+        style={{ position: 'relative' }}
+      >
         <SkipToContent />
         <SeedInitializer />
         <BetaBanner />
-        <main id="main-content" className="relative z-[1] min-h-0 overflow-visible">
+        <main id="main-content" className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-visible">
           {children}
         </main>
         <Navbar />

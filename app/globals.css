@@ -314,25 +314,37 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* Page d’accueil : scroll interne ; hauteur = viewport moins le bandeau beta */
-.home-scroll-root {
+/* Landing : body en colonne flex pour coller au bandeau (plus de gap blanc) */
+body:has(.home-scroll-root) {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  max-height: 100vh;
   height: 100dvh;
+  max-height: 100vh;
   max-height: 100dvh;
+  overflow: hidden !important;
+  /* Même teinte que le bas du hero si un sous-pixel reste */
+  background-color: #0a0a0a !important;
+}
+
+body:has(.home-scroll-root) > #main-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Page d’accueil : scroll interne ; remplit l’espace restant sous le bandeau */
+.home-scroll-root {
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
-}
-
-body:has(.beta-banner) .home-scroll-root {
-  height: calc(100vh - 2.5rem);
-  max-height: calc(100vh - 2.5rem);
-  height: calc(100dvh - 2.5rem);
-  max-height: calc(100dvh - 2.5rem);
+  background-color: #0a0a0a;
 }
 
 /* Masquer l'ascenseur visuel tout en gardant le scroll */
