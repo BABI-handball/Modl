@@ -171,20 +171,25 @@ export const messagesStore = {
   getOrCreateThread: (participantAId: string, participantBId: string, listingId?: string, initialMessage?: string): string => {
     const threads = getThreads();
     
-    // Chercher un thread existant entre ces deux participants
+    // Une conversation par paire (aligné Supabase) — le listingId reste informatif
     const existingThread = threads.find(
       (t) =>
         t.participantIds.includes(participantAId) &&
-        t.participantIds.includes(participantBId) &&
-        (!listingId || t.listingId === listingId)
+        t.participantIds.includes(participantBId)
     );
 
     if (existingThread) {
+      if (listingId && !existingThread.listingId) {
+        existingThread.listingId = listingId;
+        existingThread.updatedAt = new Date();
+        saveThreads(threads);
+      }
+
       // Synchroniser avec Supabase en arrière-plan (sans message initial car le thread existe déjà)
       messagesStoreSupabase.getOrCreateThread(participantAId, participantBId, listingId)
         .then((supabaseThreadId) => {
-          if (supabaseThreadId) {
-            // Thread synchronisé avec Supabase
+          if (supabaseThreadId && supabaseThreadId !== existingThread.id) {
+            messagesStore.migrateThreadId(existingThread.id, supabaseThreadId);
           }
         })
         .catch((error) => {
@@ -196,6 +201,19 @@ export const messagesStore = {
             }
           }
         });
+
+      if (initialMessage) {
+        const existingMessages = getMessages();
+        const similarMessage = existingMessages.find(
+          (m) =>
+            m.threadId === existingThread.id &&
+            m.fromId === participantAId &&
+            m.text.includes(initialMessage.substring(0, 20))
+        );
+        if (!similarMessage) {
+          messagesStore.sendMessage(existingThread.id, initialMessage, participantAId);
+        }
+      }
       
       return existingThread.id;
     }

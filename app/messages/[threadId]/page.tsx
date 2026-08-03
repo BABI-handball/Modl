@@ -51,9 +51,18 @@ export default function ChatPage() {
     
     const foundThread = messagesStore.getThreadById(threadId, user.id);
     if (!foundThread) {
-      if (isMountedRef.current) {
+      // Laisser une courte fenêtre pour une migration d'ID Supabase en cours
+      window.setTimeout(() => {
+        if (!isMountedRef.current) return;
+        const migrated = messagesStore.getThreadById(threadId, user.id);
+        if (migrated) {
+          setThread(migrated);
+          setMessages(messagesStore.getMessagesByThread(threadId));
+          messagesStore.markRead(threadId, user.id);
+          return;
+        }
         router.push('/messages');
-      }
+      }, 600);
       return;
     }
     

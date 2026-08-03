@@ -18,6 +18,24 @@ export const applicationsStore = {
     }
   },
 
+  /** Fusionne des candidatures locales (ex. hydratation Supabase) sans sync réseau. */
+  upsertLocal: (incoming: Application | Application[]): void => {
+    if (typeof window === 'undefined') return;
+    try {
+      const list = Array.isArray(incoming) ? incoming : [incoming];
+      if (list.length === 0) return;
+      const applications = applicationsStore.getAll();
+      const byId = new Map(applications.map((app) => [app.id, app]));
+      list.forEach((app) => {
+        const existing = byId.get(app.id);
+        byId.set(app.id, existing ? { ...existing, ...app } : app);
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(byId.values())));
+    } catch (error) {
+      console.error('Error upserting applications locally:', error);
+    }
+  },
+
   // Ajouter une candidature — retourne true si OK (local + sync Supabase pour comptes UUID)
   add: async (application: Application): Promise<boolean> => {
     if (typeof window === 'undefined') return false;
@@ -147,11 +165,19 @@ export const applicationsStore = {
     try {
       const applications = applicationsStore.getAll();
       const selectedAt = new Date();
-      const updated = applications.map((app) => 
-        app.id === applicationId 
-          ? { ...app, status: 'SELECTED' as const, selectedAt }
-          : app
-      );
+      let found = false;
+      const updated = applications.map((app) => {
+        if (app.id !== applicationId) return app;
+        found = true;
+        return { ...app, status: 'SELECTED' as const, selectedAt };
+      });
+      if (!found) {
+        // Candidature uniquement en mémoire React / Supabase : on sync le statut serveur quand même
+        applicationsStoreSupabase.updateStatus(applicationId, 'SELECTED', selectedAt).catch((error) => {
+          console.warn('Échec de la mise à jour Supabase de la candidature:', error);
+        });
+        return;
+      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       
       // Mettre à jour dans Supabase en arrière-plan avec selectedAt

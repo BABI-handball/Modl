@@ -101,12 +101,15 @@ export default function InboxPage() {
           if (userJobIds.includes(app.jobId)) applicationsMap.set(app.id, app);
         });
 
-        setApplications(
-          Array.from(applicationsMap.values()).map((app) => ({
-            ...app,
-            createdAt: app.createdAt instanceof Date ? app.createdAt : new Date(app.createdAt),
-          }))
-        );
+        const merged = Array.from(applicationsMap.values()).map((app) => ({
+          ...app,
+          createdAt: app.createdAt instanceof Date ? app.createdAt : new Date(app.createdAt),
+        }));
+
+        // Persister localement pour que swipe / match / messagerie trouvent la candidature
+        applicationsStore.upsertLocal(merged);
+
+        setApplications(merged);
       } catch {
         console.warn('Chargement Supabase des candidatures échoué, utilisation des données locales');
       }
@@ -243,7 +246,11 @@ export default function InboxPage() {
     setApplications((prev) =>
       prev.map((app) =>
         app.id === applicationId
-          ? { ...app, status: direction === 'right' ? ('SHORTLISTED' as ApplicationStatus) : ('REJECTED' as ApplicationStatus) }
+          ? {
+              ...app,
+              status: direction === 'right' ? ('SELECTED' as ApplicationStatus) : ('REJECTED' as ApplicationStatus),
+              ...(direction === 'right' ? { selectedAt: new Date() } : {}),
+            }
           : app
       )
     );
@@ -257,17 +264,24 @@ export default function InboxPage() {
     // Mettre à jour l'état local immédiatement pour le feedback visuel
     handleSwipe(applicationId, direction);
     
-    // Récupérer les applications à jour depuis le store
-    const allApplications = [...mockApplications, ...applicationsStore.getAll()];
+    // Store local + état React (candidatures hydratées depuis Supabase)
+    const allApplications = [...mockApplications, ...applicationsStore.getAll(), ...applications];
     const application = allApplications.find((app) => app.id === applicationId);
     
     if (!application) {
+      console.warn('Candidature introuvable pour le swipe:', applicationId);
       return;
     }
+
+    applicationsStore.upsertLocal(application);
     
     // Mettre à jour le statut dans le store (qui synchronise avec Supabase)
-    const newStatus: ApplicationStatus = direction === 'right' ? 'SHORTLISTED' : 'REJECTED';
-    applicationsStore.update(applicationId, { status: newStatus });
+    const newStatus: ApplicationStatus = direction === 'right' ? 'SELECTED' : 'REJECTED';
+    const selectedAt = direction === 'right' ? new Date() : undefined;
+    applicationsStore.update(applicationId, {
+      status: newStatus,
+      ...(selectedAt ? { selectedAt } : {}),
+    });
     
     // Si swipe droite (like), créer un thread de messagerie
     if (direction === 'right' && (user.role === 'BRAND' || user.role === 'PHOTOGRAPHER')) {
@@ -304,7 +318,7 @@ export default function InboxPage() {
         loadApplicationsRef.current();
       }
     }, 1000);
-  }, [user, handleSwipe, getModelProfile]);
+  }, [user, handleSwipe, getModelProfile, applications]);
 
   // Fonction pour forcer la mise à jour après une évaluation
   const handleReviewSubmitted = useCallback(() => {
