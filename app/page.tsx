@@ -176,7 +176,7 @@ export default function HomePage() {
                 <img
                   src="/logo-modl.png"
                   alt="MODL"
-                  className="h-52 w-52 object-contain brightness-0 invert drop-shadow-[0_12px_40px_rgba(0,0,0,0.35)] sm:h-[17rem] sm:w-[17rem] md:h-[19rem] md:w-[19rem] lg:h-[22rem] lg:w-[22rem]"
+                  className="h-52 w-52 object-contain drop-shadow-[0_12px_40px_rgba(0,0,0,0.1)] sm:h-[17rem] sm:w-[17rem] md:h-[19rem] md:w-[19rem] lg:h-[22rem] lg:w-[22rem]"
                 />
               </div>
 
